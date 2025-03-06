@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <unistd.h>  // For sleep()
 #include "hal/accelerometer.h"
+#include "hal/api.h"
 #include <math.h>
 
-#define SAMPLING_PERIOD_MS 100   // Sampling period in milliseconds
+#define SAMPLING_PERIOD_MS 1000   // Sampling period in milliseconds
 #define SAMPLING_PERIOD_SEC 0.1  // Sampling period in seconds
 #define GRAVITY 9.81             // Earth's gravity in m/s²
 #define ACCEL_THRESHOLD 0.12      // Ignore noise below this threshold
@@ -28,7 +29,7 @@ float getHorizontalAcceleration(AccelerometerData data) {
     // float az_corrected = az - GRAVITY;
 
     // Compute horizontal acceleration
-    float accel_horizontal = sqrt(ax * ax + ay * ay);
+    float accel_horizontal = (ax * ax + ay * ay);
 
     // Ignore small vibrations (noise filter)
     if (accel_horizontal < ACCEL_THRESHOLD) {
@@ -42,6 +43,12 @@ int main() {
     // Initialize accelerometer
     Accelerometer_initialize();
     printf("Accelerometer initialized. Reading values...\n");
+
+    // Test speed limit API
+    double test_latitude = 49.25711611228616; //49.23637861671249; //49.2631658; // 49.23637861671249;
+    double test_longitude = -122.81497897758274; //-122.82122114384818;//-122.8193008; // -122.82122114384818; 
+    int speed_limit = get_speed_limit(test_latitude, test_longitude);
+    printf("Queried Speed Limit: %d km/h\n", speed_limit);
 
     while (1) {
         // Get accelerometer reading

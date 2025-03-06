@@ -6,7 +6,10 @@ add_executable(project ${MY_SOURCES})
 
 # Make use of the HAL library
 target_link_libraries(project LINK_PRIVATE hal)
-target_link_libraries(project PRIVATE m)
+
+target_link_libraries(project PRIVATE hal ${CURL_LIBRARIES})
+target_link_libraries(project PRIVATE hal ${CJSON_LIBRARY})
+
 
 # Copy executable to final location (change `project` to project name as needed)
 add_custom_command(TARGET project POST_BUILD 
