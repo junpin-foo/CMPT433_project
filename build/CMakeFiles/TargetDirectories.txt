@@ -1,0 +1,8 @@
+/home/junpinfoo/cmpt433/work/project/build/CMakeFiles/edit_cache.dir
+/home/junpinfoo/cmpt433/work/project/build/CMakeFiles/rebuild_cache.dir
+/home/junpinfoo/cmpt433/work/project/build/hal/CMakeFiles/hal.dir
+/home/junpinfoo/cmpt433/work/project/build/hal/CMakeFiles/edit_cache.dir
+/home/junpinfoo/cmpt433/work/project/build/hal/CMakeFiles/rebuild_cache.dir
+/home/junpinfoo/cmpt433/work/project/build/app/CMakeFiles/project.dir
+/home/junpinfoo/cmpt433/work/project/build/app/CMakeFiles/edit_cache.dir
+/home/junpinfoo/cmpt433/work/project/build/app/CMakeFiles/rebuild_cache.dir
