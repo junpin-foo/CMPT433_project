@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>  // For sleep()
 #include "hal/accelerometer.h"
+#include "hal/GPS.h"
 #include "hal/api.h"
 #include <math.h>
 
@@ -42,13 +43,7 @@ float getHorizontalAcceleration(AccelerometerData data) {
 int main() {
     // Initialize accelerometer
     Accelerometer_initialize();
-    printf("Accelerometer initialized. Reading values...\n");
-
-    // Test speed limit API
-    double test_latitude = 49.25711611228616; //49.23637861671249; //49.2631658; // 49.23637861671249;
-    double test_longitude = -122.81497897758274; //-122.82122114384818;//-122.8193008; // -122.82122114384818; 
-    int speed_limit = get_speed_limit(test_latitude, test_longitude);
-    printf("Queried Speed Limit: %d km/h\n", speed_limit);
+    GPS_init();
 
     while (1) {
         // Get accelerometer reading
@@ -79,6 +74,13 @@ int main() {
         printf("Speed Change: %.2f m/s\n", speed_change);
         printf("Current Speed: %.2f m/s (%.2f km/h)\n", car_speed, speed_kmh);
         printf("Current Speed (INT): %.d km/h\n", (int) speed_kmh);
+
+        //GPS module
+        char* message = GPS_read();
+        printf("Message received: %s\n", message);
+        double latitude = 0.0, longitude = 0.0;
+        parse_GNGGA(message, &latitude, &longitude);
+        printf("Latitude: %lf, Longitude: %lf\n", latitude, longitude);
         
 
         // Sleep for the sampling period

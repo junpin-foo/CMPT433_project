@@ -4,6 +4,7 @@
         "accelerometer.h": "c",
         "joystick.h": "c",
         "math.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "termios.h": "c"
     }
 }
