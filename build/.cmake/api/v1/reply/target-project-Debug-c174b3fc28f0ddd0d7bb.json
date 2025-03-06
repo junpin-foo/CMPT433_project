@@ -139,11 +139,11 @@
 			[
 				{
 					"backtrace" : 11,
-					"path" : "/home/junpinfoo/cmpt433/work/project/app/include"
+					"path" : "/home/shaoenh/cmpt433/CMPT433_project/app/include"
 				},
 				{
 					"backtrace" : 5,
-					"path" : "/home/junpinfoo/cmpt433/work/project/hal/include"
+					"path" : "/home/shaoenh/cmpt433/CMPT433_project/hal/include"
 				}
 			],
 			"language" : "C",

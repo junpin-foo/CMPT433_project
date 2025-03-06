@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/junpinfoo/cmpt433/work/project
+CMAKE_SOURCE_DIR = /home/shaoenh/cmpt433/CMPT433_project
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/junpinfoo/cmpt433/work/project/build
+CMAKE_BINARY_DIR = /home/shaoenh/cmpt433/CMPT433_project/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,14 +87,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/junpinfoo/cmpt433/work/project/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/junpinfoo/cmpt433/work/project/build/CMakeFiles /home/junpinfoo/cmpt433/work/project/build/app//CMakeFiles/progress.marks
-	cd /home/junpinfoo/cmpt433/work/project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 app/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/junpinfoo/cmpt433/work/project/build/CMakeFiles 0
+	cd /home/shaoenh/cmpt433/CMPT433_project/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/shaoenh/cmpt433/CMPT433_project/build/CMakeFiles /home/shaoenh/cmpt433/CMPT433_project/build/app//CMakeFiles/progress.marks
+	cd /home/shaoenh/cmpt433/CMPT433_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 app/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/shaoenh/cmpt433/CMPT433_project/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/junpinfoo/cmpt433/work/project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 app/clean
+	cd /home/shaoenh/cmpt433/CMPT433_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 app/clean
 .PHONY : clean
 
 # The main clean target
@@ -103,22 +103,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/junpinfoo/cmpt433/work/project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 app/preinstall
+	cd /home/shaoenh/cmpt433/CMPT433_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 app/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/junpinfoo/cmpt433/work/project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 app/preinstall
+	cd /home/shaoenh/cmpt433/CMPT433_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 app/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/junpinfoo/cmpt433/work/project/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/shaoenh/cmpt433/CMPT433_project/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 app/CMakeFiles/project.dir/rule:
-	cd /home/junpinfoo/cmpt433/work/project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 app/CMakeFiles/project.dir/rule
+	cd /home/shaoenh/cmpt433/CMPT433_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 app/CMakeFiles/project.dir/rule
 .PHONY : app/CMakeFiles/project.dir/rule
 
 # Convenience name for target.
@@ -127,7 +127,7 @@ project: app/CMakeFiles/project.dir/rule
 
 # fast build rule for target.
 project/fast:
-	cd /home/junpinfoo/cmpt433/work/project/build && $(MAKE) $(MAKESILENT) -f app/CMakeFiles/project.dir/build.make app/CMakeFiles/project.dir/build
+	cd /home/shaoenh/cmpt433/CMPT433_project/build && $(MAKE) $(MAKESILENT) -f app/CMakeFiles/project.dir/build.make app/CMakeFiles/project.dir/build
 .PHONY : project/fast
 
 src/main.o: src/main.c.o
@@ -135,7 +135,7 @@ src/main.o: src/main.c.o
 
 # target to build an object file
 src/main.c.o:
-	cd /home/junpinfoo/cmpt433/work/project/build && $(MAKE) $(MAKESILENT) -f app/CMakeFiles/project.dir/build.make app/CMakeFiles/project.dir/src/main.c.o
+	cd /home/shaoenh/cmpt433/CMPT433_project/build && $(MAKE) $(MAKESILENT) -f app/CMakeFiles/project.dir/build.make app/CMakeFiles/project.dir/src/main.c.o
 .PHONY : src/main.c.o
 
 src/main.i: src/main.c.i
@@ -143,7 +143,7 @@ src/main.i: src/main.c.i
 
 # target to preprocess a source file
 src/main.c.i:
-	cd /home/junpinfoo/cmpt433/work/project/build && $(MAKE) $(MAKESILENT) -f app/CMakeFiles/project.dir/build.make app/CMakeFiles/project.dir/src/main.c.i
+	cd /home/shaoenh/cmpt433/CMPT433_project/build && $(MAKE) $(MAKESILENT) -f app/CMakeFiles/project.dir/build.make app/CMakeFiles/project.dir/src/main.c.i
 .PHONY : src/main.c.i
 
 src/main.s: src/main.c.s
@@ -151,7 +151,7 @@ src/main.s: src/main.c.s
 
 # target to generate assembly for a file
 src/main.c.s:
-	cd /home/junpinfoo/cmpt433/work/project/build && $(MAKE) $(MAKESILENT) -f app/CMakeFiles/project.dir/build.make app/CMakeFiles/project.dir/src/main.c.s
+	cd /home/shaoenh/cmpt433/CMPT433_project/build && $(MAKE) $(MAKESILENT) -f app/CMakeFiles/project.dir/build.make app/CMakeFiles/project.dir/src/main.c.s
 .PHONY : src/main.c.s
 
 # Help Target
@@ -177,6 +177,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/junpinfoo/cmpt433/work/project/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/shaoenh/cmpt433/CMPT433_project/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

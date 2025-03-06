@@ -1,7 +1,7 @@
 hal/CMakeFiles/hal.dir/src/accelerometer.c.o: \
- /home/junpinfoo/cmpt433/work/project/hal/src/accelerometer.c \
+ /home/shaoenh/cmpt433/CMPT433_project/hal/src/accelerometer.c \
  /usr/aarch64-linux-gnu/include/stdc-predef.h \
- /home/junpinfoo/cmpt433/work/project/hal/include/hal/accelerometer.h \
+ /home/shaoenh/cmpt433/CMPT433_project/hal/include/hal/accelerometer.h \
  /usr/lib/gcc-cross/aarch64-linux-gnu/12/include/stdint.h \
  /usr/aarch64-linux-gnu/include/stdint.h \
  /usr/aarch64-linux-gnu/include/bits/libc-header-start.h \
@@ -19,7 +19,7 @@ hal/CMakeFiles/hal.dir/src/accelerometer.c.o: \
  /usr/aarch64-linux-gnu/include/bits/wchar.h \
  /usr/aarch64-linux-gnu/include/bits/stdint-intn.h \
  /usr/aarch64-linux-gnu/include/bits/stdint-uintn.h \
- /home/junpinfoo/cmpt433/work/project/hal/include/hal/i2c.h \
+ /home/shaoenh/cmpt433/CMPT433_project/hal/include/hal/i2c.h \
  /usr/lib/gcc-cross/aarch64-linux-gnu/12/include/stddef.h \
  /usr/aarch64-linux-gnu/include/stdio.h \
  /usr/lib/gcc-cross/aarch64-linux-gnu/12/include/stdarg.h \

@@ -73,14 +73,14 @@
 				{
 					"directoryIndex" : 1,
 					"id" : "hal::@ad971efe0e95b39e260f",
-					"jsonFile" : "target-hal-Debug-374553faeed1e08bf219.json",
+					"jsonFile" : "target-hal-Debug-599bff785658e6e1fec4.json",
 					"name" : "hal",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 2,
 					"id" : "project::@5f5a17c01335469806cb",
-					"jsonFile" : "target-project-Debug-2eaf90b3a1beb7dff56d.json",
+					"jsonFile" : "target-project-Debug-c174b3fc28f0ddd0d7bb.json",
 					"name" : "project",
 					"projectIndex" : 0
 				}
@@ -90,8 +90,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/home/junpinfoo/cmpt433/work/project/build",
-		"source" : "/home/junpinfoo/cmpt433/work/project"
+		"build" : "/home/shaoenh/cmpt433/CMPT433_project/build",
+		"source" : "/home/shaoenh/cmpt433/CMPT433_project"
 	},
 	"version" : 
 	{

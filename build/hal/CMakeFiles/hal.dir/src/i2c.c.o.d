@@ -1,7 +1,7 @@
 hal/CMakeFiles/hal.dir/src/i2c.c.o: \
- /home/junpinfoo/cmpt433/work/project/hal/src/i2c.c \
+ /home/shaoenh/cmpt433/CMPT433_project/hal/src/i2c.c \
  /usr/aarch64-linux-gnu/include/stdc-predef.h \
- /home/junpinfoo/cmpt433/work/project/hal/include/hal/i2c.h \
+ /home/shaoenh/cmpt433/CMPT433_project/hal/include/hal/i2c.h \
  /usr/lib/gcc-cross/aarch64-linux-gnu/12/include/stdint.h \
  /usr/aarch64-linux-gnu/include/stdint.h \
  /usr/aarch64-linux-gnu/include/bits/libc-header-start.h \

@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/hal.dir/src/GPS.c.o"
+  "CMakeFiles/hal.dir/src/GPS.c.o.d"
   "CMakeFiles/hal.dir/src/accelerometer.c.o"
   "CMakeFiles/hal.dir/src/accelerometer.c.o.d"
   "CMakeFiles/hal.dir/src/i2c.c.o"

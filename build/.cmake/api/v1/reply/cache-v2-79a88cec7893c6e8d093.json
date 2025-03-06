@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/junpinfoo/cmpt433/work/project/build"
+			"value" : "/home/shaoenh/cmpt433/CMPT433_project/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -155,10 +155,10 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "C compiler"
 				}
 			],
-			"type" : "FILEPATH",
+			"type" : "STRING",
 			"value" : "/usr/bin/aarch64-linux-gnu-gcc"
 		},
 		{
@@ -415,7 +415,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/junpinfoo/cmpt433/work/project/build/CMakeFiles/pkgRedirects"
+			"value" : "/home/shaoenh/cmpt433/CMPT433_project/build/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -475,7 +475,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/junpinfoo/cmpt433/work/project"
+			"value" : "/home/shaoenh/cmpt433/CMPT433_project"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1083,7 +1083,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/junpinfoo/cmpt433/work/project/build"
+			"value" : "/home/shaoenh/cmpt433/CMPT433_project/build"
 		},
 		{
 			"name" : "reaction_timer_IS_TOP_LEVEL",
@@ -1107,7 +1107,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/junpinfoo/cmpt433/work/project"
+			"value" : "/home/shaoenh/cmpt433/CMPT433_project"
 		}
 	],
 	"kind" : "cache",

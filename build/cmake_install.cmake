@@ -1,4 +1,4 @@
-# Install script for directory: /home/junpinfoo/cmpt433/work/project
+# Install script for directory: /home/shaoenh/cmpt433/CMPT433_project
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,12 +44,12 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/junpinfoo/cmpt433/work/project/build/hal/cmake_install.cmake")
+  include("/home/shaoenh/cmpt433/CMPT433_project/build/hal/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/junpinfoo/cmpt433/work/project/build/app/cmake_install.cmake")
+  include("/home/shaoenh/cmpt433/CMPT433_project/build/app/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -60,5 +60,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/junpinfoo/cmpt433/work/project/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/shaoenh/cmpt433/CMPT433_project/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

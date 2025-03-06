@@ -1,27 +1,32 @@
 [
 {
-  "directory": "/home/junpinfoo/cmpt433/work/project/build/hal",
-  "command": "aarch64-linux-gnu-gcc  -I/home/junpinfoo/cmpt433/work/project/hal/hal/include -I/home/junpinfoo/cmpt433/work/project/hal/include -g -Wall -Werror -Wpedantic -Wextra -g -fno-diagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/hal.dir/src/accelerometer.c.o -c /home/junpinfoo/cmpt433/work/project/hal/src/accelerometer.c",
-  "file": "/home/junpinfoo/cmpt433/work/project/hal/src/accelerometer.c"
+  "directory": "/home/shaoenh/cmpt433/CMPT433_project/build/hal",
+  "command": "aarch64-linux-gnu-gcc  -I/home/shaoenh/cmpt433/CMPT433_project/hal/hal/include -I/home/shaoenh/cmpt433/CMPT433_project/hal/include -g -Wall -Werror -Wpedantic -Wextra -g -fno-diagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/hal.dir/src/GPS.c.o -c /home/shaoenh/cmpt433/CMPT433_project/hal/src/GPS.c",
+  "file": "/home/shaoenh/cmpt433/CMPT433_project/hal/src/GPS.c"
 },
 {
-  "directory": "/home/junpinfoo/cmpt433/work/project/build/hal",
-  "command": "aarch64-linux-gnu-gcc  -I/home/junpinfoo/cmpt433/work/project/hal/hal/include -I/home/junpinfoo/cmpt433/work/project/hal/include -g -Wall -Werror -Wpedantic -Wextra -g -fno-diagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/hal.dir/src/i2c.c.o -c /home/junpinfoo/cmpt433/work/project/hal/src/i2c.c",
-  "file": "/home/junpinfoo/cmpt433/work/project/hal/src/i2c.c"
+  "directory": "/home/shaoenh/cmpt433/CMPT433_project/build/hal",
+  "command": "aarch64-linux-gnu-gcc  -I/home/shaoenh/cmpt433/CMPT433_project/hal/hal/include -I/home/shaoenh/cmpt433/CMPT433_project/hal/include -g -Wall -Werror -Wpedantic -Wextra -g -fno-diagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/hal.dir/src/accelerometer.c.o -c /home/shaoenh/cmpt433/CMPT433_project/hal/src/accelerometer.c",
+  "file": "/home/shaoenh/cmpt433/CMPT433_project/hal/src/accelerometer.c"
 },
 {
-  "directory": "/home/junpinfoo/cmpt433/work/project/build/hal",
-  "command": "aarch64-linux-gnu-gcc  -I/home/junpinfoo/cmpt433/work/project/hal/hal/include -I/home/junpinfoo/cmpt433/work/project/hal/include -g -Wall -Werror -Wpedantic -Wextra -g -fno-diagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/hal.dir/src/joystick.c.o -c /home/junpinfoo/cmpt433/work/project/hal/src/joystick.c",
-  "file": "/home/junpinfoo/cmpt433/work/project/hal/src/joystick.c"
+  "directory": "/home/shaoenh/cmpt433/CMPT433_project/build/hal",
+  "command": "aarch64-linux-gnu-gcc  -I/home/shaoenh/cmpt433/CMPT433_project/hal/hal/include -I/home/shaoenh/cmpt433/CMPT433_project/hal/include -g -Wall -Werror -Wpedantic -Wextra -g -fno-diagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/hal.dir/src/i2c.c.o -c /home/shaoenh/cmpt433/CMPT433_project/hal/src/i2c.c",
+  "file": "/home/shaoenh/cmpt433/CMPT433_project/hal/src/i2c.c"
 },
 {
-  "directory": "/home/junpinfoo/cmpt433/work/project/build/hal",
-  "command": "aarch64-linux-gnu-gcc  -I/home/junpinfoo/cmpt433/work/project/hal/hal/include -I/home/junpinfoo/cmpt433/work/project/hal/include -g -Wall -Werror -Wpedantic -Wextra -g -fno-diagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/hal.dir/src/led.c.o -c /home/junpinfoo/cmpt433/work/project/hal/src/led.c",
-  "file": "/home/junpinfoo/cmpt433/work/project/hal/src/led.c"
+  "directory": "/home/shaoenh/cmpt433/CMPT433_project/build/hal",
+  "command": "aarch64-linux-gnu-gcc  -I/home/shaoenh/cmpt433/CMPT433_project/hal/hal/include -I/home/shaoenh/cmpt433/CMPT433_project/hal/include -g -Wall -Werror -Wpedantic -Wextra -g -fno-diagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/hal.dir/src/joystick.c.o -c /home/shaoenh/cmpt433/CMPT433_project/hal/src/joystick.c",
+  "file": "/home/shaoenh/cmpt433/CMPT433_project/hal/src/joystick.c"
 },
 {
-  "directory": "/home/junpinfoo/cmpt433/work/project/build/app",
-  "command": "aarch64-linux-gnu-gcc  -I/home/junpinfoo/cmpt433/work/project/app/include -I/home/junpinfoo/cmpt433/work/project/hal/include -g -Wall -Werror -Wpedantic -Wextra -g -fno-diagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/project.dir/src/main.c.o -c /home/junpinfoo/cmpt433/work/project/app/src/main.c",
-  "file": "/home/junpinfoo/cmpt433/work/project/app/src/main.c"
+  "directory": "/home/shaoenh/cmpt433/CMPT433_project/build/hal",
+  "command": "aarch64-linux-gnu-gcc  -I/home/shaoenh/cmpt433/CMPT433_project/hal/hal/include -I/home/shaoenh/cmpt433/CMPT433_project/hal/include -g -Wall -Werror -Wpedantic -Wextra -g -fno-diagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/hal.dir/src/led.c.o -c /home/shaoenh/cmpt433/CMPT433_project/hal/src/led.c",
+  "file": "/home/shaoenh/cmpt433/CMPT433_project/hal/src/led.c"
+},
+{
+  "directory": "/home/shaoenh/cmpt433/CMPT433_project/build/app",
+  "command": "aarch64-linux-gnu-gcc  -I/home/shaoenh/cmpt433/CMPT433_project/app/include -I/home/shaoenh/cmpt433/CMPT433_project/hal/include -g -Wall -Werror -Wpedantic -Wextra -g -fno-diagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/project.dir/src/main.c.o -c /home/shaoenh/cmpt433/CMPT433_project/app/src/main.c",
+  "file": "/home/shaoenh/cmpt433/CMPT433_project/app/src/main.c"
 }
 ]

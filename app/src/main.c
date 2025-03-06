@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>  // For sleep()
 #include "hal/accelerometer.h"
+#include "hal/GPS.h"
 #include <math.h>
 
 #define SAMPLING_PERIOD_MS 100   // Sampling period in milliseconds
@@ -38,47 +39,60 @@ float getHorizontalAcceleration(AccelerometerData data) {
     return accel_horizontal;
 }
 
+// int main() {
+//     // Initialize accelerometer
+//     Accelerometer_initialize();
+//     printf("Accelerometer initialized. Reading values...\n");
+
+//     while (1) {
+//         // Get accelerometer reading
+//         AccelerometerData data = Accelerometer_getReading();
+
+        
+//         // Compute acceleration
+//         float accel_horizontal = getHorizontalAcceleration(data);
+
+//         // Compute speed change (v = a * t)
+//         float speed_change = accel_horizontal * SAMPLING_PERIOD_SEC;
+
+//         // Update speed
+//         if (accel_horizontal > 0) {
+//             car_speed += speed_change;  // Accelerate
+//         } else {
+//             car_speed *= DECAY_FACTOR;  // Apply friction
+//         }
+
+//         // Convert to km/h
+//         float speed_kmh = car_speed * 3.6;
+        
+
+//         // Print values
+//         printf("X: %d, Y: %d, Z: %d\n", data.x, data.y, data.z);
+        
+//         printf("Acceleration: %.2f m/s²\n", accel_horizontal);
+//         printf("Speed Change: %.2f m/s\n", speed_change);
+//         printf("Current Speed: %.2f m/s (%.2f km/h)\n", car_speed, speed_kmh);
+//         printf("Current Speed (INT): %.d km/h\n", (int) speed_kmh);
+        
+
+//         // Sleep for the sampling period
+//         usleep(SAMPLING_PERIOD_MS * 1000);
+//     }
+
+//     // Cleanup resources
+//     Accelerometer_cleanUp();
+//     return 0;
+// }
+
 int main() {
-    // Initialize accelerometer
-    Accelerometer_initialize();
-    printf("Accelerometer initialized. Reading values...\n");
-
+    GPS_init();
     while (1) {
-        // Get accelerometer reading
-        AccelerometerData data = Accelerometer_getReading();
-
-        
-        // Compute acceleration
-        float accel_horizontal = getHorizontalAcceleration(data);
-
-        // Compute speed change (v = a * t)
-        float speed_change = accel_horizontal * SAMPLING_PERIOD_SEC;
-
-        // Update speed
-        if (accel_horizontal > 0) {
-            car_speed += speed_change;  // Accelerate
-        } else {
-            car_speed *= DECAY_FACTOR;  // Apply friction
-        }
-
-        // Convert to km/h
-        float speed_kmh = car_speed * 3.6;
-        
-
-        // Print values
-        printf("X: %d, Y: %d, Z: %d\n", data.x, data.y, data.z);
-        
-        printf("Acceleration: %.2f m/s²\n", accel_horizontal);
-        printf("Speed Change: %.2f m/s\n", speed_change);
-        printf("Current Speed: %.2f m/s (%.2f km/h)\n", car_speed, speed_kmh);
-        printf("Current Speed (INT): %.d km/h\n", (int) speed_kmh);
-        
-
-        // Sleep for the sampling period
-        usleep(SAMPLING_PERIOD_MS * 1000);
+        char* message = GPS_read();
+        printf("Message received: %s\n", message);
+        double latitude = 0.0, longitude = 0.0;
+        parse_GNGGA(message, &latitude, &longitude);
+        printf("Latitude: %lf, Longitude: %lf\n", latitude, longitude);
+        sleep(1);
     }
-
-    // Cleanup resources
-    Accelerometer_cleanUp();
     return 0;
 }
