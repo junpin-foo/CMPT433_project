@@ -44,9 +44,10 @@ int main() {
     // Initialize accelerometer
     Accelerometer_initialize();
     // GPS_init();
-
+    
     double test_latitude = 49.25711611228616; //49.23637861671249; //49.2631658; // 49.23637861671249;
     double test_longitude = -122.81497897758274; //-122.82122114384818;//-122.8193008; // -122.82122114384818; 
+
     int speed_limit = get_speed_limit(test_latitude, test_longitude);
     printf("Queried Speed Limit: %d km/h\n", speed_limit);
 
@@ -82,12 +83,13 @@ int main() {
 
         //GPS module
         // char* message = GPS_read();
-        // printf("Message received: %s\n", message);
         // double latitude = 0.0, longitude = 0.0;
-        // parse_GNGGA(message, &latitude, &longitude);
-        // printf("Latitude: %lf, Longitude: %lf\n", latitude, longitude);
-        
-
+        // parse_GNGGA(message, &test_latitude, &test_longitude);
+        // if (test_latitude == -1000 || test_longitude == -1000) {
+        //     printf("Invalid GPS coordinates\n");
+        // } else {
+        // printf("Latitude: %lf, Longitude: %lf\n", test_latitude, test_longitude);
+        // }
         // Sleep for the sampling period
         usleep(SAMPLING_PERIOD_MS * 1000);
     }

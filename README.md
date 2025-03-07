@@ -81,7 +81,6 @@ To manually run CMake from the command line use:
   # Build (compile & link) the project
   cmake --build build
 ```
-
 ## Finer Points
 
 - When using the header files in HAL, you'll need to:  

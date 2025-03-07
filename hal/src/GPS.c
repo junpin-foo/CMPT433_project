@@ -61,16 +61,17 @@ char* GPS_read() {
 }
 
 void parse_GNGGA(char* gngga_sentence, double* latitude, double* longitude) {
+    
     char *token;
     char temp[255];
     
-    // Set latitude and longitude to -1000 initially (invalid values)
+    // Set latitude and longitude to invalid values
     *latitude = -1000;
     *longitude = -1000;
 
     // Make a copy to avoid modifying the original
     strcpy(temp, gngga_sentence);
-
+    
     // Skip the $GNGGA
     token = strtok(temp, ",");
     if (token == NULL || strcmp(token, "$GNGGA") != 0) {
@@ -85,7 +86,10 @@ void parse_GNGGA(char* gngga_sentence, double* latitude, double* longitude) {
     token = strtok(NULL, ",");
     if (token == NULL || strlen(token) == 0) return; // Invalid sentence (missing latitude)
 
-    *latitude = atof(token);  // Convert latitude to double
+    double raw_lat = atof(token);
+    int lat_deg = (int)(raw_lat / 100); // Extract degrees
+    double lat_min = raw_lat - (lat_deg * 100); // Extract minutes
+    *latitude = lat_deg + (lat_min / 60.0); // Convert to decimal degrees
 
     // N/S Indicator
     token = strtok(NULL, ",");
@@ -95,7 +99,10 @@ void parse_GNGGA(char* gngga_sentence, double* latitude, double* longitude) {
     token = strtok(NULL, ",");
     if (token == NULL || strlen(token) == 0) return; // Invalid sentence (missing longitude)
 
-    *longitude = atof(token); // Convert longitude to double
+    double raw_lon = atof(token);
+    int lon_deg = (int)(raw_lon / 100); // Extract degrees
+    double lon_min = raw_lon - (lon_deg * 100); // Extract minutes
+    *longitude = lon_deg + (lon_min / 60.0); // Convert to decimal degrees
 
     // E/W Indicator
     token = strtok(NULL, ",");

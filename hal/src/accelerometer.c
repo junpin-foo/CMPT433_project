@@ -46,8 +46,8 @@ void Accelerometer_initialize(void) {
     // write_i2c_reg8(i2c_file_desc, REG_CTRL3, 0x03);  //no sleep
     // write_i2c_reg8(i2c_file_desc, REG_CTRL4, 0x01);  //Data-Ready is routed to INT1 pad
     // write_i2c_reg8(i2c_file_desc, REG_CTRL5, 0x01);
-    write_i2c_reg8(i2c_file_desc, REG_CTRL6, 0x24); //+8g
-    // write_i2c_reg8(i2c_file_desc, REG_CTRL6, 0x00); //+2g
+    // write_i2c_reg8(i2c_file_desc, REG_CTRL6, 0x24); //+8g
+    write_i2c_reg8(i2c_file_desc, REG_CTRL6, 0x00); //+2g
     // write_i2c_reg8(i2c_file_desc, REG_CTRL2, 0x40); //soft reset
 
     uint8_t fifo_config = (0x00 << 3) | (0x00);  // FMode = 110, FTH = 0x0A
