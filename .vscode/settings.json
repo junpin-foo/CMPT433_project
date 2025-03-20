@@ -5,6 +5,8 @@
         "joystick.h": "c",
         "math.h": "c",
         "stddef.h": "c",
-        "termios.h": "c"
+        "termios.h": "c",
+        "time.h": "c",
+        "sleep_and_timer.h": "c"
     }
 }

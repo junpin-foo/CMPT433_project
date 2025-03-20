@@ -9,6 +9,7 @@ find_package(cJSON REQUIRED)
 include_directories(${CURL_INCLUDE_DIRS})
 
 include_directories(hal/include)
+include_directories(${CMAKE_SOURCE_DIR}/app/include)
 file(GLOB MY_SOURCES "src/*.c")
 
 add_library(hal STATIC ${MY_SOURCES})
