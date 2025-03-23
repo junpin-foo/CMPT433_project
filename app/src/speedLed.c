@@ -67,8 +67,8 @@ static void* updateSpeedAndLEDThreadFunc(void* arg) {
         // Get GPS reading 
         /*
         char* message = GPS_read();
-        double latitude = 0.0, longitude = 0.0;
-        parse_GNGGA(message, &latitude, &longitude);
+        double latitude = 0.0, longitude = 0.0, speed = 0.0;
+        void parse_GPRMC(char* gprmc_sentence, double* latitude, double* longitude, double* speed);
 
         if (latitude != -1000 && longitude != -1000) {
             if (!first_gps_reading) {
