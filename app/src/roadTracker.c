@@ -20,8 +20,9 @@ struct location {
 };
 
 static struct location target_location = {0.0, 0.0};
-static bool target_set = true;
+static bool target_set = false;
 static void* trackLocationThreadFunc(void* arg);
+static double targetDistanceFromSetting = -1;
 
 // Convert degrees to radians
 static double deg_to_rad(double deg) {
@@ -66,11 +67,11 @@ static void* trackLocationThreadFunc(void* arg) {
     (void)arg; // Suppress unused parameter warning
     while (isRunning) {
         if (target_set) {
-            char* gps_data = GPS_read();
-            struct location current_location = {0.0, 0.0};
-            double speed = 0;
-            parse_GPRMC(gps_data, &current_location.latitude, &current_location.longitude, &speed);
-
+            // char* gps_data = GPS_read();
+            struct location current_location = {49.255280, -122.811226};
+            // double speed = 0;
+            // Comment out this for test
+            // parse_GPRMC(gps_data, &current_location.latitude, &current_location.longitude, &speed);
             if (current_location.latitude != -1000 && current_location.longitude != -1000) {
                 current_distance = haversine_distance(current_location, target_location);
                 printf("Distance to target: %.2f km\n", current_distance);
@@ -88,6 +89,12 @@ void RoadTracker_setTarget(double latitude, double longitude) {
     assert(isInitialized);
     target_location.latitude = latitude;
     target_location.longitude = longitude;
+    // char* gps_data = GPS_read();
+    struct location current_location = {49.255280, -122.811226};
+    // double speed = 0;
+    // Comment out this for test
+    // parse_GPRMC(gps_data, &current_location.latitude, &current_location.longitude, &speed);
+    targetDistanceFromSetting = haversine_distance(current_location, target_location);
     target_set = true;
     printf("Target set to: Latitude %.6f, Longitude %.6f\n", latitude, longitude);
 }
