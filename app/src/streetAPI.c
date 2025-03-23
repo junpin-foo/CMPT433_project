@@ -2,19 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <curl/curl.h>
+#include <assert.h>
 #include "streetAPI.h"
 #include <json-c/json.h>
 
 // Define the location structure
 
 #define API_URL "https://nominatim.openstreetmap.org/search?format=json&q="
+static bool isInitialize = false;
 
-struct Response {
-    char *data;
-    size_t size;
-};
+void StreetAPI_init(){
+    assert(!isInitialize);
+    isInitialize = true;
+}
 
-size_t write_callback(void *ptr, size_t size, size_t nmemb, struct Response *res) {
+static size_t write_callback(void *ptr, size_t size, size_t nmemb, struct Response *res) {
     size_t new_size = size * nmemb;
     res->data = realloc(res->data, res->size + new_size + 1);
     if (res->data == NULL) return 0;
@@ -25,7 +27,7 @@ size_t write_callback(void *ptr, size_t size, size_t nmemb, struct Response *res
 }
 
 // Function to replace spaces with %20
-void url_encode(const char *input, char *output, size_t max_len) {
+static void url_encode(const char *input, char *output, size_t max_len) {
     size_t j = 0;
     for (size_t i = 0; input[i] != '\0' && j < max_len - 3; i++) {
         if (input[i] == ' ') {
@@ -38,7 +40,8 @@ void url_encode(const char *input, char *output, size_t max_len) {
     output[j] = '\0';
 }
 
-struct location get_lat_long(const char *address) {
+struct location StreetAPI_get_lat_long(const char *address) {
+    assert(isInitialize);
     CURL *curl;
     CURLcode res;
     struct Response response = {NULL, 0};
@@ -82,4 +85,7 @@ struct location get_lat_long(const char *address) {
     return loc;
 }
 
-
+void StreetAPI_cleanup() {
+    assert(isInitialize);
+    isInitialize = false;
+}

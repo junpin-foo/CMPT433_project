@@ -42,12 +42,27 @@ void GPS_init() {
     }
 }
 
+void configure_serial(int serial_port) {
+    struct termios options;
+
+    // Get current settings
+    tcgetattr(serial_port, &options);
+
+    // Set timeout behavior
+    options.c_cc[VMIN]  = 0;   // Minimum number of characters to read
+    options.c_cc[VTIME] = 10;  // Timeout in tenths of a second (10 = 1 second)
+
+    // Apply settings
+    tcsetattr(serial_port, TCSANOW, &options);
+}
+
 
 char* GPS_read() {
     static char read_buf[255];
+    configure_serial(serial_port);
     while (1) {  // Keep reading until we find a $GNGGA message
-        int n = read(serial_port, read_buf, sizeof(read_buf) - 1); // Leave space for null terminator
-
+        printf("waiting for GPS DATA\n");
+        int n = read(serial_port, &read_buf, sizeof(read_buf)); // Leave space for null terminator
         if (n > 0) {
             read_buf[n] = '\0'; // Properly terminate the string
             
@@ -57,6 +72,7 @@ char* GPS_read() {
                 return read_buf;
             }
         }
+        sleep(1);
     }
 }
 

@@ -11,6 +11,12 @@ struct location {
     double latitude;
     double longitude;
 };
-struct location get_lat_long(const char *address);
 
+struct Response {
+    char *data;
+    size_t size;
+};
+struct location get_lat_long(const char *address);
+void StreetAPI_init();
+void StreetAPI_cleanup();
 #endif
