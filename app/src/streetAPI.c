@@ -5,8 +5,7 @@
 #include <assert.h>
 #include "streetAPI.h"
 #include <json-c/json.h>
-
-// Define the location structure
+#include "hal/GPS.h"
 
 #define API_URL "https://nominatim.openstreetmap.org/search?format=json&q="
 static bool isInitialize = false;

@@ -7,11 +7,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-struct location {
-    double latitude;
-    double longitude;
-};
-
 struct Response {
     char *data;
     size_t size;

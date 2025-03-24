@@ -14,11 +14,6 @@ static pthread_t roadTrackerThread;
 static bool isRunning = false;
 static bool isInitialized = false;
 
-struct location {
-    double latitude;
-    double longitude;
-};
-
 static struct location target_location = {0.0, 0.0};
 static bool target_set = false;
 static void* trackLocationThreadFunc(void* arg);

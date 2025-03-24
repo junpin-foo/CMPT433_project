@@ -7,6 +7,10 @@
         "stddef.h": "c",
         "termios.h": "c",
         "time.h": "c",
-        "sleep_and_timer.h": "c"
+        "sleep_and_timer.h": "c",
+        "gps.h": "c",
+        "speedlimitapi.h": "c",
+        "speedlimitled.h": "c",
+        "roadtracker.h": "c"
     }
 }

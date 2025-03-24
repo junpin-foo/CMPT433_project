@@ -1,4 +1,4 @@
-#include "api.h"
+#include "speedLimitAPI.h"
 #include <stdbool.h>
 #include <curl/curl.h>
 #include <cjson/cJSON.h>
@@ -9,7 +9,7 @@
 #define OVERPASS_API_URL "https://overpass-api.de/api/interpreter"
 
 // Default speed limits based on road types
-int estimate_speed_limit(const char *highway_type) {
+static int estimate_speed_limit(const char *highway_type) {
     if (strcmp(highway_type, "motorway") == 0) return 90;
     if (strcmp(highway_type, "motorway_link") == 0) return 90;
     if (strcmp(highway_type, "trunk") == 0) return 100;
@@ -24,7 +24,7 @@ int estimate_speed_limit(const char *highway_type) {
     if (strcmp(highway_type, "residential") == 0) return 30;
     if (strcmp(highway_type, "living_street") == 0) return 30;
 
-    return -1; // Unknown road type
+    return 50; // Unknown road type (default 50) was -1
 }
 
 struct MemoryStruct {
@@ -82,7 +82,7 @@ int get_speed_limit(double latitude, double longitude) {
             fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
         } else {
             // Print the full JSON response
-            printf("Response from Overpass API:\n%s\n", chunk.memory);
+            // printf("Response from Overpass API:\n%s\n", chunk.memory);
 
             cJSON *json = cJSON_Parse(chunk.memory);
             if(json) {
@@ -129,5 +129,5 @@ int get_speed_limit(double latitude, double longitude) {
     }
     curl_global_cleanup();
     free(chunk.memory);
-    return -1; // Speed limit not found
+    return 50; // Speed limit not found (default 50) was -1
 }

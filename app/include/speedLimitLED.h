@@ -11,4 +11,8 @@ void SpeedLED_init(void);
 
 void SpeedLED_cleanup(void);
 
+int SpeedLED_getSpeedLimit(void);
+
+double SpeedLED_getSpeed(void);
+
 #endif

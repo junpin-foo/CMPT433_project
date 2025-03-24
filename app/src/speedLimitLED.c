@@ -5,7 +5,7 @@
 #include <time.h>
 #include <stdbool.h>
 #include <pthread.h>
-#include "api.h"
+#include "speedLimitAPI.h"
 #include "hal/GPS.h"
 #include "hal/accelerometer.h"
 #include "sleep_and_timer.h"
@@ -13,6 +13,7 @@
 #include <math.h>
 
 static pthread_t updateLEDThread;
+static pthread_t updateSpeedLimitThread;
 static bool isRunning = false;
 static bool isInitialized = false;
 
@@ -23,6 +24,8 @@ static bool isInitialized = false;
 #define DECAY_FACTOR 0.7       // Simulate friction and air resistance (was 0.95)
 
 float car_speed = 0.0;  // Initial speed in m/s
+double speed_kmh = 0.0; 
+int speedLimit = 0;
 
 static float getHorizontalAcceleration(AccelerometerData data) {
     // Convert from G to m/s²
@@ -38,8 +41,6 @@ static float getHorizontalAcceleration(AccelerometerData data) {
 
 static void* updateSpeedAndLEDThreadFunc(void* arg) {
     (void)arg; // Suppress unused parameter warning
-    // double prev_latitude = 0.0, prev_longitude = 0.0;
-    // int first_gps_reading = 1;
     while (isRunning) {
 
         //get coords from GPS
@@ -62,32 +63,54 @@ static void* updateSpeedAndLEDThreadFunc(void* arg) {
         }
 
         // Convert to km/h
-        float speed_kmh = car_speed * 3.6;
+        float acc_speed_kmh = car_speed * 3.6;
 
         // Get GPS reading 
-        /*
-        char* message = GPS_read();
-        double latitude = 0.0, longitude = 0.0, speed = 0.0;
-        void parse_GPRMC(char* gprmc_sentence, double* latitude, double* longitude, double* speed);
+        // char* gps = GPS_read();
+        // struct location current_location = {-1000, -1000};
+        double gps_speed_kmh = 0.0;
+        // parse_GPRMC(gps, &current_location.latitude, &current_location.longitude, &gps_speed_kmh);
 
-        if (latitude != -1000 && longitude != -1000) {
-            if (!first_gps_reading) {
-                double gps_speed = calculate_gps_speed(prev_latitude, prev_longitude, latitude, longitude, SAMPLING_PERIOD_SEC);
-                printf("GPS Speed: %.2f km/h\n", gps_speed);
-                car_speed = (gps_speed / 3.6); // Sync estimated speed with GPS
-            }
-            prev_latitude = latitude;
-            prev_longitude = longitude;
-            first_gps_reading = 0;
+        speed_kmh = acc_speed_kmh; //set as accelerometer data
+
+        // Use GPS speed if available
+        // if (gps_speed > 0) {
+        //     speed_kmh = gps_speed;
+        // }
+
+        
+        if (speed_kmh > speedLimit) {
+            // Over speed limit -> LED Red
+        } else if (speed_kmh - speedLimit > 10) {
+            // 10km/h before over -> LED Yellow
+        } else {
+            // Within limit -> Green
         }
-        */
-
+        
         // Print values
         printf("X: %f, Y: %f, Z: %f\n", data.x, data.y, data.z);
         printf("Acceleration: %.2f m/s²\n", accel_horizontal);
         printf("Speed Change: %.2f m/s\n", speed_change);
-        printf("Current Speed: %.2f m/s (%.2f km/h)\n", car_speed, speed_kmh);
+        printf("Current Speed: (gps) %.2f km/h, (acc) %.2f km/h\n", gps_speed_kmh, acc_speed_kmh);
 
+        sleepForMs(SAMPLING_PERIOD_MS);
+        
+    }
+    return NULL;
+}
+
+static void* updateSpeedLimitFunc(void* arg) {
+    (void)arg; // Suppress unused parameter warning
+    while (isRunning) {
+        // Get GPS reading 
+        // char* gps = GPS_read();
+        struct location current_location = {-1000, -1000};
+        // double gps_speed_kmh = 0.0;
+        // parse_GPRMC(gps, &current_location.latitude, &current_location.longitude, &gps_speed_kmh);
+
+        speedLimit = get_speed_limit(current_location.latitude, current_location.longitude);
+        printf("Speed Limit: %d km/h\n", speedLimit);
+    
         sleepForMs(SAMPLING_PERIOD_MS);
         
     }
@@ -99,6 +122,7 @@ void SpeedLED_init(void) {
     isRunning = true;
     isInitialized = true;
     pthread_create(&updateLEDThread, NULL, &updateSpeedAndLEDThreadFunc, NULL);
+    pthread_create(&updateSpeedLimitThread, NULL, &updateSpeedLimitFunc, NULL);
 
 }
 
@@ -106,5 +130,16 @@ void SpeedLED_cleanup(void) {
     assert(isInitialized);
     isRunning = false;
     pthread_join(updateLEDThread, NULL);
+    pthread_join(updateSpeedLimitThread, NULL);
     isInitialized = false;
+}
+
+int SpeedLED_getSpeedLimit(void) {
+    assert(isInitialized);
+    return speedLimit;
+}
+
+double SpeedLED_getSpeed(void) {
+    assert(isInitialized);
+    return speed_kmh;
 }

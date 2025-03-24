@@ -6,7 +6,8 @@ add_executable(project ${MY_SOURCES})
 
 # Make use of the HAL library
 target_link_libraries(project LINK_PRIVATE hal)
-
+target_link_libraries(project LINK_PRIVATE lcd)
+target_link_libraries(project LINK_PRIVATE lgpio)
 target_link_libraries(project PRIVATE hal ${CURL_LIBRARIES})
 target_link_libraries(project PRIVATE hal ${CJSON_LIBRARY})
 
@@ -17,3 +18,6 @@ add_custom_command(TARGET project POST_BUILD
      "$<TARGET_FILE:project>"
      "~/cmpt433/public/project" 
   COMMENT "Copying ARM executable to public NFS directory")
+
+find_library(GPIOD_LIBRARY gpiod)       
+target_link_libraries(project LINK_PRIVATE gpiod)
