@@ -25,13 +25,6 @@ int main() {
     RoadTracker_init();
     RoadTracker_setTarget("Simon Fraser University");
     while(1){
-    // char address[256];
-        // printf("Enter address: ");
-        // fgets(address, sizeof(address), stdin);
-        // address[strcspn(address, "\n")] = 0;  // Remove newline character
-        // struct location test = StreetAPI_get_lat_long(address);
-        // printf("%f\n", test.latitude);
-        // printf("%f\n", test.longitude);
         sleepForMs(1000);
     }
     // Cleanup resources
