@@ -39,12 +39,12 @@ static void url_encode(const char *input, char *output, size_t max_len) {
     output[j] = '\0';
 }
 
-struct location StreetAPI_get_lat_long(const char *address) {
+struct location StreetAPI_get_lat_long(char *address) {
     assert(isInitialize);
     CURL *curl;
     CURLcode res;
     struct Response response = {NULL, 0};
-    struct location loc = {-1000, -1000}; // Default invalid values
+    struct location loc = {-1000, -1000, -1}; // Default invalid values
 
     curl = curl_easy_init();
     if (!curl) {

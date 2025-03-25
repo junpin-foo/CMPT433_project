@@ -5,7 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "hal/GPS.h"
 int serial_port;
+
+static char* GPS_read();
+static struct location parse_GPRMC(char* gprmc_sentence);
 
 void GPS_init() { 
     serial_port = open("/dev/ttyAMA0", O_RDWR); 
@@ -56,8 +60,13 @@ void configure_serial(int serial_port) {
     tcsetattr(serial_port, TCSANOW, &options);
 }
 
+struct location GPS_getLocation() {
+    char* gps = GPS_read();
+    return parse_GPRMC(gps);
+}
 
-char* GPS_read() {
+
+static char* GPS_read() {
     static char read_buf[255];
     configure_serial(serial_port);
     while (1) {  // Keep reading until we find a $GNGGA message
@@ -76,61 +85,59 @@ char* GPS_read() {
     }
 }
 
-void parse_GPRMC(char* gprmc_sentence, double* latitude, double* longitude, double* speed) {
+static struct location parse_GPRMC(char* gprmc_sentence) {
     char *token;
     char temp[255];
+    struct location data = {-1000,-1000,-1};
 
-    // Set default invalid values
-    *latitude = -1000;
-    *longitude = -1000;
-    *speed = -1;
-
+    struct location invalidData = {INVALID_LATITUDE, INVALID_LONGITUDE, INVALID_SPEED};
     // Make a copy to avoid modifying the original
     strcpy(temp, gprmc_sentence);
     
     // Skip the $GPRMC
     token = strtok(temp, ",");
     if (token == NULL || strcmp(token, "$GPRMC") != 0) {
-        return; // Invalid sentence (not starting with $GPRMC)
+        return invalidData; // Invalid sentence (not starting with $GPRMC)
     }
     
     // Skip time (ignore)
     token = strtok(NULL, ",");
-    if (token == NULL) return;
+    if (token == NULL) return invalidData;
     
     // Status (A = valid, V = void)
     token = strtok(NULL, ",");
     if (token == NULL || token[0] != 'A') {
-        return; // Invalid sentence (data not valid)
+        return invalidData; // Invalid sentence (data not valid)
     }
 
     // Latitude
     token = strtok(NULL, ",");
-    if (token == NULL || strlen(token) == 0) return;
+    if (token == NULL || strlen(token) == 0) return invalidData;
     double raw_lat = atof(token);
     int lat_deg = (int)(raw_lat / 100);
     double lat_min = raw_lat - (lat_deg * 100);
-    *latitude = lat_deg + (lat_min / 60.0);
+    data.latitude = lat_deg + (lat_min / 60.0);
 
     // N/S Indicator
     token = strtok(NULL, ",");
-    if (token && token[0] == 'S') *latitude = -*latitude;
+    if (token && token[0] == 'S') data.latitude = -data.latitude;
 
     // Longitude
     token = strtok(NULL, ",");
-    if (token == NULL || strlen(token) == 0) return;
+    if (token == NULL || strlen(token) == 0) return invalidData;
     double raw_lon = atof(token);
     int lon_deg = (int)(raw_lon / 100);
     double lon_min = raw_lon - (lon_deg * 100);
-    *longitude = lon_deg + (lon_min / 60.0);
+    data.longitude = lon_deg + (lon_min / 60.0);
 
     // E/W Indicator
     token = strtok(NULL, ",");
-    if (token && token[0] == 'W') *longitude = -*longitude;
+    if (token && token[0] == 'W') data.longitude = -data.longitude;
 
     // Speed in knots
     token = strtok(NULL, ",");
     if (token != NULL && strlen(token) > 0) {
-        *speed = atof(token) * 1.852;
+        data.speed = atof(token) * 1.852;
     }
+    return data;
 }

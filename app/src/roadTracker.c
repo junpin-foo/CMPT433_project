@@ -5,6 +5,7 @@
 #include <math.h>
 #include <assert.h>
 #include "hal/GPS.h"
+#include "streetAPI.h"
 #include "sleep_and_timer.h"
 
 #define EARTH_RADIUS 6371.0 // Radius of Earth in kilometers
@@ -14,10 +15,12 @@ static pthread_t roadTrackerThread;
 static bool isRunning = false;
 static bool isInitialized = false;
 
-static struct location target_location = {0.0, 0.0};
+static struct location target_location = {0.0, 0.0, -1};
 static bool target_set = false;
 static void* trackLocationThreadFunc(void* arg);
-static double targetDistanceFromSetting = -1;
+static double totalDistanceNeeded = -1;
+static double current_distance = -1;
+static double progress = 0;
 
 // Convert degrees to radians
 static double deg_to_rad(double deg) {
@@ -54,24 +57,26 @@ void RoadTracker_cleanup(void) {
     isInitialized = false;
 }
 
-
 // Thread function to track location
-double current_distance = -1;
 static void* trackLocationThreadFunc(void* arg) {
     assert(isInitialized);
     (void)arg; // Suppress unused parameter warning
     while (isRunning) {
         if (target_set) {
-            // char* gps_data = GPS_read();
-            struct location current_location = {49.255280, -122.811226};
-            // double speed = 0;
-            // Comment out this for test
-            // parse_GPRMC(gps_data, &current_location.latitude, &current_location.longitude, &speed);
-            if (current_location.latitude != -1000 && current_location.longitude != -1000) {
-                current_distance = haversine_distance(current_location, target_location);
-                printf("Distance to target: %.2f km\n", current_distance);
+            struct location current_location = {49.255280, -122.811226, -1};
+            current_distance = haversine_distance(current_location, target_location);
+            if (totalDistanceNeeded > 0) {
+                progress = ((totalDistanceNeeded - current_distance) / totalDistanceNeeded) * 100;
+                if (current_distance <= 0.05) { // If within 50 meters of target
+                    printf("Target reached. Resetting target.\n");
+                    target_set = false;
+                    totalDistanceNeeded = -1;
+                    target_location.latitude = 0.0;
+                    target_location.longitude = 0.0;
+                }
+                printf("Distance to target: %.2f km | Progress: %.2f%%\n", current_distance, progress);
             } else {
-                printf("Invalid GPS data.\n");
+                printf("Distance to target: %.2f km\n", current_distance);
             }
         }
         sleepForMs(1000);
@@ -79,17 +84,19 @@ static void* trackLocationThreadFunc(void* arg) {
     return NULL;
 }
 
+// Expecting to be call from microphone
 // Function to set the target location
-void RoadTracker_setTarget(double latitude, double longitude) {
+void RoadTracker_setTarget(char *address) {
     assert(isInitialized);
-    target_location.latitude = latitude;
-    target_location.longitude = longitude;
-    // char* gps_data = GPS_read();
-    struct location current_location = {49.255280, -122.811226};
-    // double speed = 0;
-    // Comment out this for test
-    // parse_GPRMC(gps_data, &current_location.latitude, &current_location.longitude, &speed);
-    targetDistanceFromSetting = haversine_distance(current_location, target_location);
-    target_set = true;
-    printf("Target set to: Latitude %.6f, Longitude %.6f\n", latitude, longitude);
+    struct location current_location  = GPS_getLocation();
+    // struct location current_location = {49.255280, -122.811226, -1};
+    if (current_location.latitude == -INVALID_LATITUDE) {
+        printf("Unable to set up target due to invalid current location\n");
+    } else {
+        target_location = StreetAPI_get_lat_long("Simon Fraser University");
+        totalDistanceNeeded = haversine_distance(current_location, target_location);
+        target_set = true;
+        printf("Target set to: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, totalDistanceNeeded);
+    }
 }
+

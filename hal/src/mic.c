@@ -14,6 +14,7 @@ char transcription_result[1024] = {0}; // To store transcription result
 
 // Function to handle recording audio using arecord
 void *record_audio(void *arg) {
+    (void)arg; // Suppress unused parameter warning
     char *record_cmd[] = {
         "arecord", 
         "--device=hw:2,0", 
@@ -198,61 +199,61 @@ char* get_speech_content(void) {
 }
 
 
-int main(int argc, char *argv[]) {
-    char input_buffer[32];
+// int main(int argc, char *argv[]) {
+//     char input_buffer[32];
     
-    printf("Voice Recognition System\n");
-    printf("------------------------\n");
+//     printf("Voice Recognition System\n");
+//     printf("------------------------\n");
     
-    // Check if speech.py exists at startup
-    if (access("speech.py", F_OK) == -1) {
-        printf("Warning: speech.py not found in the current directory.\n");
-        printf("Make sure speech.py is in the same directory as this program.\n");
-    } else {
-        printf("Found speech.py in the current directory.\n");
-    }
+//     // Check if speech.py exists at startup
+//     if (access("speech.py", F_OK) == -1) {
+//         printf("Warning: speech.py not found in the current directory.\n");
+//         printf("Make sure speech.py is in the same directory as this program.\n");
+//     } else {
+//         printf("Found speech.py in the current directory.\n");
+//     }
     
-    printf("Commands:\n");
-    printf("  record - Start recording\n");
-    printf("  stop   - Stop recording\n");
-    printf("  quit   - Exit program\n\n");
+//     printf("Commands:\n");
+//     printf("  record - Start recording\n");
+//     printf("  stop   - Stop recording\n");
+//     printf("  quit   - Exit program\n\n");
     
-    while (1) {
-        printf("> ");
-        fflush(stdout);
+//     while (1) {
+//         printf("> ");
+//         fflush(stdout);
         
-        if (fgets(input_buffer, sizeof(input_buffer), stdin) == NULL) {
-            break;
-        }
+//         if (fgets(input_buffer, sizeof(input_buffer), stdin) == NULL) {
+//             break;
+//         }
         
-        // Remove trailing newline
-        input_buffer[strcspn(input_buffer, "\n")] = 0;
+//         // Remove trailing newline
+//         input_buffer[strcspn(input_buffer, "\n")] = 0;
         
-        if (strcmp(input_buffer, "record") == 0) {
-            printf("Recording... (type 'stop' to stop)\n");
-            start_recording();
-        } else if (strcmp(input_buffer, "stop") == 0) {
-            if (recording_active) {
-                stop_recording();
-                char* result = transcribe_audio();
-                if (result) {
-                    printf("Recognized Text: %s\n", result);
-                }
-            } else {
-                printf("Not currently recording.\n");
-            }
-        } else if (strcmp(input_buffer, "quit") == 0 || 
-                   strcmp(input_buffer, "exit") == 0) {
-            if (recording_active) {
-                stop_recording();
-            }
-            break;
-        } else if (strlen(input_buffer) > 0) {
-            printf("Unknown command: %s\n", input_buffer);
-        }
-    }
+//         if (strcmp(input_buffer, "record") == 0) {
+//             printf("Recording... (type 'stop' to stop)\n");
+//             start_recording();
+//         } else if (strcmp(input_buffer, "stop") == 0) {
+//             if (recording_active) {
+//                 stop_recording();
+//                 char* result = transcribe_audio();
+//                 if (result) {
+//                     printf("Recognized Text: %s\n", result);
+//                 }
+//             } else {
+//                 printf("Not currently recording.\n");
+//             }
+//         } else if (strcmp(input_buffer, "quit") == 0 || 
+//                    strcmp(input_buffer, "exit") == 0) {
+//             if (recording_active) {
+//                 stop_recording();
+//             }
+//             break;
+//         } else if (strlen(input_buffer) > 0) {
+//             printf("Unknown command: %s\n", input_buffer);
+//         }
+//     }
     
-    printf("Exiting...\n");
-    return 0;
-}
+//     printf("Exiting...\n");
+//     return 0;
+// }
 

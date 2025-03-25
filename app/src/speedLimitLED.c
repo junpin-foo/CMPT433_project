@@ -66,10 +66,8 @@ static void* updateSpeedAndLEDThreadFunc(void* arg) {
         float acc_speed_kmh = car_speed * 3.6;
 
         // Get GPS reading 
-        // char* gps = GPS_read();
-        // struct location current_location = {-1000, -1000};
-        double gps_speed_kmh = 0.0;
-        // parse_GPRMC(gps, &current_location.latitude, &current_location.longitude, &gps_speed_kmh);
+        // struct location current_location = GPS_getLocation();
+        // double gps_speed_kmh = current_location.speed;
 
         speed_kmh = acc_speed_kmh; //set as accelerometer data
 
@@ -88,10 +86,10 @@ static void* updateSpeedAndLEDThreadFunc(void* arg) {
         }
         
         // Print values
-        printf("X: %f, Y: %f, Z: %f\n", data.x, data.y, data.z);
-        printf("Acceleration: %.2f m/s²\n", accel_horizontal);
-        printf("Speed Change: %.2f m/s\n", speed_change);
-        printf("Current Speed: (gps) %.2f km/h, (acc) %.2f km/h\n", gps_speed_kmh, acc_speed_kmh);
+        // printf("X: %f, Y: %f, Z: %f\n", data.x, data.y, data.z);
+        // printf("Acceleration: %.2f m/s²\n", accel_horizontal);
+        // printf("Speed Change: %.2f m/s\n", speed_change);
+        // printf("Current Speed: (gps) %.2f km/h, (acc) %.2f km/h\n", gps_speed_kmh, acc_speed_kmh);
 
         sleepForMs(SAMPLING_PERIOD_MS);
         
@@ -103,10 +101,9 @@ static void* updateSpeedLimitFunc(void* arg) {
     (void)arg; // Suppress unused parameter warning
     while (isRunning) {
         // Get GPS reading 
-        // char* gps = GPS_read();
-        struct location current_location = {-1000, -1000};
-        // double gps_speed_kmh = 0.0;
-        // parse_GPRMC(gps, &current_location.latitude, &current_location.longitude, &gps_speed_kmh);
+        struct location current_location  = {-1000, -1000, -1};
+        // struct location current_location = GPS_getLocation();
+        // double gps_speed_kmh = current_location.speed;
 
         speedLimit = get_speed_limit(current_location.latitude, current_location.longitude);
         printf("Speed Limit: %d km/h\n", speedLimit);

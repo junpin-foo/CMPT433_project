@@ -18,9 +18,9 @@ int main() {
     UpdateLcd_init();
     SpeedLED_init();
     StreetAPI_init();
-    // RoadTracker_init();
-    // struct location test = StreetAPI_get_lat_long("Simon Fraser University");
-    // RoadTracker_setTarget(test.latitude, test.longitude);
+    RoadTracker_init();
+    struct location test = StreetAPI_get_lat_long("Simon Fraser University");
+    RoadTracker_setTarget(test.latitude, test.longitude);
     while(1){
     // char address[256];
         // printf("Enter address: ");

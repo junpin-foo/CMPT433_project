@@ -5,7 +5,7 @@
 # set(CURL_INCLUDE_DIR "/usr/include/x86_64-linux-gnu")
 # set(CURL_LIBRARY "/usr/lib/x86_64-linux-gnu/libcurl.so")
 find_package(CURL REQUIRED)
-# find_package(cJSON REQUIRED)
+find_package(cJSON REQUIRED)
 include_directories(${CURL_INCLUDE_DIRS})
 
 include_directories(hal/include)
