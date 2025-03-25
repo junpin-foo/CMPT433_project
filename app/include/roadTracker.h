@@ -8,9 +8,17 @@
 #include <math.h>
 #include "streetAPI.h"
 
-double haversine_distance(struct location loc1, struct location loc2);
-void RoadTracker_setTarget(double latitude, double longitude);
 void RoadTracker_init();
+void RoadTracker_setTarget(char* address);
 void RoadTracker_cleanup();
+
+struct location RoadTracker_getSourceLocation();
+// Function to get the target location
+struct location RoadTracker_getTargetLocation();
+// Function to get the target location address
+char* RoadTracker_getTargetAddress();
+
+// Function to get progress percentage
+double RoadTracker_getProgress();
 
 #endif // ROADTRACKER_H

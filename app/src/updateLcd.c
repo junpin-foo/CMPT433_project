@@ -19,6 +19,9 @@
 #include "updateLcd.h"
 #include "sleep_and_timer.h"
 #include "speedLimitLED.h"
+#include "hal/joystick.h"
+#include "hal/GPS.h"
+#include "roadTracker.h"
 
 #define DELAY_MS 2000
 #define SLEEP_MS 10
@@ -30,12 +33,15 @@
 #define DIPS_X 120
 #define MAX_MS_X 160
 #define VALUE_OFFSET 40
-#define statBufferSize 12
+#define statBufferSize 64
 
 static UWORD *s_fb;
 static bool isInitialized = false;
 static char speed_str[statBufferSize];
 static char limit_str[statBufferSize];
+static char progress_str[statBufferSize];
+static char source_location_str[statBufferSize];
+static char target_location_str[statBufferSize];
 
 static pthread_t outputThread;
 static bool isRunning = false;
@@ -86,14 +92,17 @@ static void* UpdateLcdThread(void* args) {
     (void) args;
     assert(isInitialized);
     while (isRunning) {
-        UpdateLcd(SpeedLED_getSpeed(), SpeedLED_getSpeedLimit());
+        if (Joystick_getPageCount() == 1) {
+            UpdateLcd_Speed(SpeedLED_getSpeed(), SpeedLED_getSpeedLimit());
+        } else {
+            UpdateLcd_roadTracker(RoadTracker_getProgress(), RoadTracker_getTargetAddress(), RoadTracker_getSourceLocation(), RoadTracker_getTargetLocation());
+        }
         sleepForMs(SLEEP_MS);
     }
     return NULL;
 }
 
-
-void UpdateLcd(double gps_speed_kmh, int speed_limit)
+void UpdateLcd_Speed(double gps_speed_kmh, int speed_limit)
 {
     assert(isInitialized);
 
@@ -120,6 +129,49 @@ void UpdateLcd(double gps_speed_kmh, int speed_limit)
         } else {
             Paint_DrawRectangle(85, y, 130, y + 50, GREEN, DOT_PIXEL_1X1, DRAW_FILL_FULL);
         }
+
+    LCD_1IN54_Display(s_fb);
+}
+
+void UpdateLcd_roadTracker(double progress, const char* target_address, struct location source_location, struct location target_location)
+{
+    assert(isInitialized);
+
+    const int x = INITIAL_X;
+    int y = INITIAL_Y;
+
+    Paint_NewImage(s_fb, LCD_1IN54_WIDTH, LCD_1IN54_HEIGHT, 0, WHITE, 16);
+    Paint_Clear(WHITE);
+
+    sprintf(progress_str, "%.1f%%", progress);
+    
+    if (source_location.latitude == -1000 || source_location.longitude == -1000) {
+        sprintf(source_location_str, "NULL");
+    } else {
+        snprintf(source_location_str, statBufferSize, "%.6f, %.6f", source_location.latitude, source_location.longitude);
+    }
+
+    if (target_location.latitude == -1000 || target_location.longitude == -1000) {
+        sprintf(target_location_str, "NULL");
+    } else {
+        snprintf(target_location_str, statBufferSize, "%.6f, %.6f", target_location.latitude, target_location.longitude);
+    }
+
+    Paint_DrawString_EN(x, y, "Progress:", &Font20, WHITE, BLACK);
+    Paint_DrawString_EN(x + 100, y, progress_str, &Font20, WHITE, BLACK);
+    y += NEXTLINE_Y;
+
+    Paint_DrawString_EN(x, y, "Target:", &Font20, WHITE, BLACK);
+    Paint_DrawString_EN(x + 80, y, target_address, &Font20, WHITE, BLACK);
+    y += NEXTLINE_Y;
+    
+    Paint_DrawString_EN(x, y, "Source Loc:", &Font20, WHITE, BLACK);
+    Paint_DrawString_EN(x + 120, y, source_location_str, &Font20, WHITE, BLACK);
+    y += NEXTLINE_Y;
+
+    Paint_DrawString_EN(x, y, "Target Loc:", &Font20, WHITE, BLACK);
+    Paint_DrawString_EN(x + 120, y, target_location_str, &Font20, WHITE, BLACK);
+    y += NEXTLINE_Y;
 
     LCD_1IN54_Display(s_fb);
 }

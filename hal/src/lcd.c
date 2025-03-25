@@ -11,7 +11,6 @@
 #include <unistd.h>
 #include <updateLcd.h>
 
-
 #define BUFFER_SIZE 100
 
 static bool isInitialized = false;

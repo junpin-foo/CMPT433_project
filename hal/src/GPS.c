@@ -70,7 +70,7 @@ static char* GPS_read() {
     static char read_buf[255];
     configure_serial(serial_port);
     while (1) {  // Keep reading until we find a $GNGGA message
-        printf("waiting for GPS DATA\n");
+        // printf("waiting for GPS DATA\n");
         int n = read(serial_port, &read_buf, sizeof(read_buf)); // Leave space for null terminator
         if (n > 0) {
             read_buf[n] = '\0'; // Properly terminate the string
