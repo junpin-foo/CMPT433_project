@@ -7,7 +7,8 @@
 #include <json-c/json.h>
 #include "hal/GPS.h"
 
-#define API_URL "https://nominatim.openstreetmap.org/search?format=json&q="
+#define API_URL_ADRESS "https://nominatim.openstreetmap.org/search?format=json&q="
+#define API_URL_LAT_LON "https://nominatim.openstreetmap.org/reverse?format=json&lat=%f&lon=%f"
 static bool isInitialize = false;
 
 void StreetAPI_init(){
@@ -56,7 +57,7 @@ struct location StreetAPI_get_lat_long(char *address) {
     url_encode(address, encoded_address, sizeof(encoded_address));
 
     char url[1024]; // Increase buffer size to handle longer URLs
-    snprintf(url, sizeof(url), "%s%s", API_URL, encoded_address);
+    snprintf(url, sizeof(url), "%s%s", API_URL_ADRESS, encoded_address);
 
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
@@ -82,6 +83,54 @@ struct location StreetAPI_get_lat_long(char *address) {
     free(response.data);
     curl_easy_cleanup(curl);
     return loc;
+}
+
+char* StreetAPI_get_address_from_lat_lon(double lat, double lon) {
+    assert(isInitialize);
+    CURL *curl;
+    CURLcode res;
+    struct Response response = {NULL, 0};
+    char *address = NULL;  // Default null value for address
+
+    curl = curl_easy_init();
+    if (!curl) {
+        fprintf(stderr, "Failed to initialize CURL\n");
+        return NULL;
+    }
+
+    char url[1024];
+    snprintf(url, sizeof(url), API_URL_LAT_LON, lat, lon);
+
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0");
+
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK) {
+        fprintf(stderr, "CURL request failed: %s\n", curl_easy_strerror(res));
+    } else {
+        // Manual JSON parsing using strstr() and extracting the display_name
+        char *address_ptr = strstr(response.data, "\"display_name\":\"");
+        if (address_ptr) {
+            address_ptr += strlen("\"display_name\":\"");
+            char *end_ptr = strchr(address_ptr, '"');
+            if (end_ptr) {
+                size_t len = end_ptr - address_ptr;
+                address = malloc(len + 1);
+                if (address) {
+                    strncpy(address, address_ptr, len);
+                    address[len] = '\0';
+                }
+            }
+        } else {
+            printf("No address found for the given coordinates.\n");
+        }
+    }
+
+    free(response.data);
+    curl_easy_cleanup(curl);
+    return address;
 }
 
 void StreetAPI_cleanup() {

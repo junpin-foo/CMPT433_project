@@ -139,46 +139,52 @@ void UpdateLcd_roadTracker(double progress, const char* target_address, struct l
 
     const int x = INITIAL_X;
     int y = INITIAL_Y;
-    progress = 50;
+    // progress = 50;
     Paint_NewImage(s_fb, LCD_1IN54_WIDTH, LCD_1IN54_HEIGHT, 0, WHITE, 16);
     Paint_Clear(WHITE);
-    printf("progress: %.1f", progress);
+    // printf("progress: %.1f", progress);
     sprintf(progress_str, "%.1f%%", progress);
     
     if (source_location.latitude == -1000 || source_location.longitude == -1000) {
         sprintf(source_location_str, "NULL");
     } else {
-        snprintf(source_location_str, statBufferSize, "%.6f, %.6f", source_location.latitude, source_location.longitude);
+        snprintf(source_location_str, statBufferSize, "%.6f,%.6f", source_location.latitude, source_location.longitude);
     }
 
     if (target_location.latitude == -1000 || target_location.longitude == -1000) {
         sprintf(target_location_str, "NULL");
     } else {
-        snprintf(target_location_str, statBufferSize, "%.6f, %.6f", target_location.latitude, target_location.longitude);
+        snprintf(target_location_str, statBufferSize, "%.6f,%.6f", target_location.latitude, target_location.longitude);
     }
 
     Paint_DrawString_EN(x, y, "Target Location:", &Font16, WHITE, BLACK);
     y += 20;
     Paint_DrawString_EN(x, y, target_address, &Font16, WHITE, BLACK);
-    y += NEXTLINE_Y;
+    y += 40;
+
+    Paint_DrawString_EN(x, y, "Current Location:", &Font16, WHITE, BLACK);
+    y += 20;
+    Paint_DrawString_EN(x, y, source_location_str, &Font16, WHITE, BLACK);
+    y += 20;
+
     Paint_DrawString_EN(x, y, "Progress:", &Font16, WHITE, BLACK);
     Paint_DrawString_EN(x + 130, y, progress_str, &Font16, WHITE, BLACK);
-    y += NEXTLINE_Y;
+    y += 20;
 
-    // Progress Bar Drawing
-    int progressBarWidth = LCD_1IN54_WIDTH;  // Width of the progress bar (can be adjusted)
-    int progressBarHeight = 30;  // Height of the progress bar
-    int progressBarX = x;        // X position for the progress bar
-    int progressBarY = y + 10;   // Y position for the progress bar (slightly below the text)
+    if (progress < 100) {
+        // Progress Bar Drawing
+        int progressBarWidth = LCD_1IN54_WIDTH;  // Width of the progress bar (can be adjusted)
+        int progressBarHeight = 30;  // Height of the progress bar
+        int progressBarX = x;        // X position for the progress bar
+        int progressBarY = y + 10;   // Y position for the progress bar (slightly below the text)
 
-    // Calculate the width of the filled progress bar based on the progress
-    int filledWidth = (int)((progress / 100.0) * progressBarWidth);
-
-    // Draw the progress bar (empty part)
-    Paint_DrawRectangle(progressBarX, progressBarY, progressBarX + progressBarWidth, progressBarY + progressBarHeight, WHITE, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-    
-    // Draw the filled part of the progress bar
-    Paint_DrawRectangle(progressBarX, progressBarY, progressBarX + filledWidth, progressBarY + progressBarHeight, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-
+        // Calculate the width of the filled progress bar based on the progress
+        int filledWidth = (int)((progress / 100.0) * progressBarWidth);
+        // // Draw the progress bar (empty part)
+        // Paint_DrawRectangle(progressBarX, progressBarY, progressBarX + progressBarWidth, progressBarY + progressBarHeight, WHITE, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
+        
+        // Draw the filled part of the progress bar
+        Paint_DrawRectangle(progressBarX, progressBarY, progressBarX + filledWidth, progressBarY + progressBarHeight, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    }
     LCD_1IN54_Display(s_fb);
 }

@@ -12,6 +12,7 @@ struct Response {
     size_t size;
 };
 struct location StreetAPI_get_lat_long(char *address);
+char* StreetAPI_get_address_from_lat_lon(double lat, double lon);
 void StreetAPI_init();
 void StreetAPI_cleanup();
 #endif

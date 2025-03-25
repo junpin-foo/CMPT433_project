@@ -66,8 +66,8 @@ static void* updateSpeedAndLEDThreadFunc(void* arg) {
         float acc_speed_kmh = car_speed * 3.6;
 
         // Get GPS reading 
-        // struct location current_location = GPS_getLocation();
-        // double gps_speed_kmh = current_location.speed;
+        struct location current_location = GPS_getLocation();
+        double gps_speed_kmh = current_location.speed;
 
         speed_kmh = acc_speed_kmh; //set as accelerometer data
 
@@ -86,10 +86,10 @@ static void* updateSpeedAndLEDThreadFunc(void* arg) {
         }
         
         // Print values
-        // printf("X: %f, Y: %f, Z: %f\n", data.x, data.y, data.z);
-        // printf("Acceleration: %.2f m/s²\n", accel_horizontal);
-        // printf("Speed Change: %.2f m/s\n", speed_change);
-        // printf("Current Speed: (gps) %.2f km/h, (acc) %.2f km/h\n", gps_speed_kmh, acc_speed_kmh);
+        printf("X: %f, Y: %f, Z: %f\n", data.x, data.y, data.z);
+        printf("Acceleration: %.2f m/s²\n", accel_horizontal);
+        printf("Speed Change: %.2f m/s\n", speed_change);
+        printf("Current Speed: (gps) %.2f km/h, (acc) %.2f km/h\n", gps_speed_kmh, acc_speed_kmh);
 
         sleepForMs(SAMPLING_PERIOD_MS);
         
