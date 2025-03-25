@@ -91,7 +91,7 @@ static void* trackLocationThreadFunc(void* arg) {
                 }
             }
         }
-        sleepForMs(1000);
+        sleepForMs(500);
     }
     return NULL;
 }
@@ -99,8 +99,8 @@ static void* trackLocationThreadFunc(void* arg) {
 // Function to set the target location
 void RoadTracker_setTarget(char *address) {
     assert(isInitialized);
-    // struct location temp_source_location  = GPS_getLocation();
-    struct location temp_source_location  = {49.255280, -122.811226, -1};
+    struct location temp_source_location  = GPS_getLocation();
+    // struct location temp_source_location  = {49.255280, -122.811226, -1};
     if (temp_source_location.latitude == -INVALID_LATITUDE) {
         printf("Unable to set up target due to invalid current location\n");
     } else {

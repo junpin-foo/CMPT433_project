@@ -76,7 +76,7 @@ static char* GPS_read() {
             read_buf[n] = '\0'; // Properly terminate the string
             
             // Check if the received message starts with "$GNGGA"
-            if (strncmp(read_buf, "$GNGGA", 6) == 0) {
+            if (strncmp(read_buf, "$GNRMC", 5) == 0) {
                 // printf("Geo graphic data received: %s\n", read_buf);
                 return read_buf;
             }
@@ -85,19 +85,18 @@ static char* GPS_read() {
     }
 }
 
-static struct location parse_GPRMC(char* gprmc_sentence) {
+static struct location parse_GPRMC(char* gnrmc_sentence) {
     char *token;
     char temp[255];
-    struct location data = {-1000,-1000,-1};
+    struct location data = {-1000, -1000, -1};
 
     struct location invalidData = {INVALID_LATITUDE, INVALID_LONGITUDE, INVALID_SPEED};
     // Make a copy to avoid modifying the original
-    strcpy(temp, gprmc_sentence);
-    
-    // Skip the $GPRMC
+    strcpy(temp, gnrmc_sentence);
+    // Skip the $GNRMC identifier
     token = strtok(temp, ",");
-    if (token == NULL || strcmp(token, "$GPRMC") != 0) {
-        return invalidData; // Invalid sentence (not starting with $GPRMC)
+    if (token == NULL || strcmp(token, "$GNRMC") != 0) {
+        return invalidData; // Invalid sentence (not starting with $GNRMC)
     }
     
     // Skip time (ignore)
@@ -134,10 +133,11 @@ static struct location parse_GPRMC(char* gprmc_sentence) {
     token = strtok(NULL, ",");
     if (token && token[0] == 'W') data.longitude = -data.longitude;
 
-    // Speed in knots
+    // Speed in knots (convert to km/h)
     token = strtok(NULL, ",");
     if (token != NULL && strlen(token) > 0) {
         data.speed = atof(token) * 1.852;
     }
+    
     return data;
 }
