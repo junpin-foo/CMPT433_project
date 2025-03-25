@@ -24,7 +24,7 @@ static int estimate_speed_limit(const char *highway_type) {
     if (strcmp(highway_type, "residential") == 0) return 30;
     if (strcmp(highway_type, "living_street") == 0) return 30;
 
-    return 50; // Unknown road type (default 50) was -1
+    return -1; // Unknown road type (default 50) was -1
 }
 
 struct MemoryStruct {
@@ -129,5 +129,5 @@ int get_speed_limit(double latitude, double longitude) {
     }
     curl_global_cleanup();
     free(chunk.memory);
-    return 50; // Speed limit not found (default 50) was -1
+    return -1; // Speed limit not found (default 50) was -1
 }

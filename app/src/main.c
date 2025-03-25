@@ -23,7 +23,7 @@ int main() {
     SpeedLED_init();
     StreetAPI_init();
     RoadTracker_init();
-    RoadTracker_setTarget("Simon Fraser University");
+    RoadTracker_setTarget("1960 Como Lake Ave, Coquitlam, BC V3J 3R3");
     while(1){
         sleepForMs(1000);
     }

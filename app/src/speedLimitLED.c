@@ -101,8 +101,8 @@ static void* updateSpeedLimitFunc(void* arg) {
     (void)arg; // Suppress unused parameter warning
     while (isRunning) {
         // Get GPS reading 
-        struct location current_location  = {-1000, -1000, -1};
-        // struct location current_location = GPS_getLocation();
+        // struct location current_location  = {-1000, -1000, -1};
+        struct location current_location = GPS_getLocation();
         // double gps_speed_kmh = current_location.speed;
 
         speedLimit = get_speed_limit(current_location.latitude, current_location.longitude);

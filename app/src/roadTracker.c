@@ -66,8 +66,8 @@ static void* trackLocationThreadFunc(void* arg) {
     (void)arg; // Suppress unused parameter warning
     while (isRunning) {
         if (target_set) {
-            // struct location current_location  = GPS_getLocation();
-            struct location current_location = {49.263239, -122.857701, -1};
+            struct location current_location  = GPS_getLocation();
+            // struct location current_location = {49.263239, -122.857701, -1};
             souruce_location.latitude = current_location.latitude;
             souruce_location.longitude = current_location.longitude;
             souruce_location.speed = current_location.speed;
@@ -85,7 +85,7 @@ static void* trackLocationThreadFunc(void* arg) {
                         // target_location.latitude = 0.0;
                         // target_location.longitude = 0.0;
                     }
-                    printf("Distance to target: %.2f km | Progress: %.2f%%\n", current_distance, progress);
+                    // printf("Distance to target: %.2f km | Progress: %.2f%%\n", current_distance, progress);
                 } else {
                     printf("Distance to target: %.2f km\n", current_distance);
                 }
