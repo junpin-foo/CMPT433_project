@@ -11,6 +11,7 @@
         "gps.h": "c",
         "speedlimitapi.h": "c",
         "speedlimitled.h": "c",
-        "roadtracker.h": "c"
+        "roadtracker.h": "c",
+        "stdlib.h": "c"
     }
 }
