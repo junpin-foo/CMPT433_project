@@ -5,23 +5,51 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <pthread.h>
 #include "hal/GPS.h"
 #include "sleep_and_timer.h"
+
 int serial_port;
+static pthread_t gps_thread;
+static pthread_mutex_t gps_mutex = PTHREAD_MUTEX_INITIALIZER;  // Mutex to protect current_location
+static struct location current_location = {-1000, -1000, -1};  // Default invalid location
 
 static char* GPS_read();
 static struct location parse_GPRMC(char* gprmc_sentence);
 
-void GPS_init() { 
-    serial_port = open("/dev/ttyAMA0", O_RDWR); 
-    if (serial_port < 0) { 
-        printf("Error %i from open: %s\n", errno, strerror(errno)); 
-     }
+// Function that runs in the thread to continuously read GPS data
+static void* gps_thread_func(void* arg) {
+    (void)arg;
+    while (1) {
+        // Get the latest GPS data
+        char* gps_data = GPS_read();
+        // Parse the data into the location structure
+        struct location new_location = parse_GPRMC(gps_data);
+        
+        // Update the global location safely using mutex
+        if (new_location.latitude != INVALID_LATITUDE) {
+            pthread_mutex_lock(&gps_mutex);   // Lock the mutex before updating
+            current_location = new_location;
+            pthread_mutex_unlock(&gps_mutex); // Unlock the mutex after updating
+        }
+        
+        sleepForMs(100);  // Sleep for 100ms before reading again
+    }
+    return NULL;
+}
+
+void GPS_init() {
+    serial_port = open("/dev/ttyAMA0", O_RDWR);
+    if (serial_port < 0) {
+        printf("Error %i from open: %s\n", errno, strerror(errno));
+        return;
+    }
 
     struct termios tty;
 
-    if(tcgetattr(serial_port, &tty) != 0) {
+    if (tcgetattr(serial_port, &tty) != 0) {
         printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
+        return;
     }
 
     tty.c_cflag &= ~PARENB;
@@ -44,7 +72,19 @@ void GPS_init() {
     cfsetspeed(&tty, B9600);
     if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
+        return;
     }
+
+    // Create the GPS thread that will continuously read and update the location
+    pthread_create(&gps_thread, NULL, gps_thread_func, NULL);
+}
+
+struct location GPS_getLocation() {
+    struct location loc;
+    pthread_mutex_lock(&gps_mutex);   // Lock the mutex before reading
+    loc = current_location;
+    pthread_mutex_unlock(&gps_mutex); // Unlock the mutex after reading
+    return loc;  // Return the most recent GPS location
 }
 
 void configure_serial(int serial_port) {
@@ -61,24 +101,16 @@ void configure_serial(int serial_port) {
     tcsetattr(serial_port, TCSANOW, &options);
 }
 
-struct location GPS_getLocation() {
-    char* gps = GPS_read();
-    return parse_GPRMC(gps);
-}
-
-
 static char* GPS_read() {
     static char read_buf[255];
     configure_serial(serial_port);
     while (1) {  // Keep reading until we find a $GNGGA message
-        // printf("waiting for GPS DATA\n");
         int n = read(serial_port, &read_buf, sizeof(read_buf)); // Leave space for null terminator
         if (n > 0) {
             read_buf[n] = '\0'; // Properly terminate the string
             
-            // Check if the received message starts with "$GNGGA"
+            // Check if the received message starts with "$GNRMC"
             if (strncmp(read_buf, "$GNRMC", 5) == 0) {
-                // printf("Geo graphic data received: %s\n", read_buf);
                 return read_buf;
             }
         }
@@ -91,8 +123,10 @@ static struct location parse_GPRMC(char* gnrmc_sentence) {
     char temp[255];
     struct location data = {-1000, -1000, -1};
     struct location invalidData = {INVALID_LATITUDE, INVALID_LONGITUDE, INVALID_SPEED};
+
     // Make a copy to avoid modifying the original
     strcpy(temp, gnrmc_sentence);
+
     // Skip the $GNRMC identifier
     token = strtok(temp, ",");
     if (token == NULL || strcmp(token, "$GNRMC") != 0) {
