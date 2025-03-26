@@ -25,13 +25,14 @@ static void* gps_thread_func(void* arg) {
         char* gps_data = GPS_read();
         // Parse the data into the location structure
         struct location new_location = parse_GPRMC(gps_data);
-        
+
         // Update the global location safely using mutex
-        if (new_location.latitude != INVALID_LATITUDE) {
-            pthread_mutex_lock(&gps_mutex);   // Lock the mutex before updating
-            current_location = new_location;
-            pthread_mutex_unlock(&gps_mutex); // Unlock the mutex after updating
+        pthread_mutex_lock(&gps_mutex);   // Lock the mutex before updating
+        current_location = new_location;
+        if (current_location.latitude == INVALID_LATITUDE) {
+            printf("NO GPS Signal !\n");
         }
+        pthread_mutex_unlock(&gps_mutex); // Unlock the mutex after updating
         
         sleepForMs(100);  // Sleep for 100ms before reading again
     }

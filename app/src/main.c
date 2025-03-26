@@ -23,7 +23,7 @@ int main() {
     SpeedLED_init();
     StreetAPI_init();
     RoadTracker_init();
-    RoadTracker_setTarget("2929 Barnet Hwy #2201, Coquitlam, BC V3B 5R5");
+    RoadTracker_setTarget("13450 102 Ave #250, Surrey, BC V3T 0A3");
     while(1){
         sleepForMs(1000);
     }

@@ -16,8 +16,8 @@ static pthread_t roadTrackerThread;
 static bool isRunning = false;
 static bool isInitialized = false;
 
-static struct location target_location = {0.0, 0.0, -1};
-static struct location souruce_location = {0.0, 0.0, -1};
+static struct location target_location = {INVALID_LATITUDE, INVALID_LONGITUDE, -1};
+static struct location souruce_location = {INVALID_LATITUDE, INVALID_LONGITUDE, -1};
 static bool target_set = false;
 static void* trackLocationThreadFunc(void* arg);
 static double totalDistanceNeeded = -1;
