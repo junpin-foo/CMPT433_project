@@ -13,6 +13,13 @@ return
 -1 : memory error
 -2 : Speed limit not found
 -3 : Unknown road type
+
+todo: 
+1. CHECK QUERY FOR ALL STREET TYPES BEFORE RETURNING NON FOUND
+2. INCREASE TIMEOUT
+3. FIX COLOUR
+4. KEEP CURRENT NUMBER UNTIL A NEW NOT ERROR IS FOUND
+5. BLUETOOTH
 */
 
 // Default speed limits based on road types
