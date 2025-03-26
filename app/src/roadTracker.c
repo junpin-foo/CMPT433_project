@@ -74,7 +74,7 @@ static void* trackLocationThreadFunc(void* arg) {
             if (current_location.latitude == INVALID_LATITUDE) {
                 printf("Unable to check due to invalid data\n");
             } else {
-                printf("Current Location: Latitude %.6f, Longitude: %.6f\n", current_location.latitude, current_location.longitude);
+                printf("Current Location: Latitude %.6f, Longitude: %.6f, Speed: %.6f \n", current_location.latitude, current_location.longitude, current_location.speed);
                 current_distance = haversine_distance(current_location, target_location);
                 if (totalDistanceNeeded > 0) {
                     progress = ((totalDistanceNeeded - current_distance) / totalDistanceNeeded) * 100;
@@ -96,10 +96,10 @@ static void* trackLocationThreadFunc(void* arg) {
 // Function to set the target location
 void RoadTracker_setTarget(char *address) {
     assert(isInitialized);
-    struct location temp_source_location  = GPS_getLocation();
-    // struct location temp_source_location  = {49.255280, -122.811226, -1};
-    if (temp_source_location.latitude == -INVALID_LATITUDE) {
-        printf("Unable to set up target due to invalid current location\n");
+    // struct location temp_source_location  = GPS_getLocation();
+    struct location temp_source_location  = {49.255280, -122.811226, -1};
+    if (temp_source_location.latitude == INVALID_LATITUDE) {
+        printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again !\n");
     } else {
         strncpy(target_address, address, sizeof(target_address) - 1);
         target_address[sizeof(target_address) - 1] = '\0'; // Ensure null termination
@@ -109,7 +109,7 @@ void RoadTracker_setTarget(char *address) {
         souruce_location.speed = temp_source_location.speed;
         totalDistanceNeeded = haversine_distance(souruce_location, target_location);
         target_set = true;
-        printf("Target set to: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, totalDistanceNeeded);
+        printf("Target set to: Latitude %.6f, Longitude %.6f | Source Location: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, souruce_location.latitude, souruce_location.longitude, totalDistanceNeeded);
     }
 }
 

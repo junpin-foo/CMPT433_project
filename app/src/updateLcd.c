@@ -138,7 +138,7 @@ void UpdateLcd_roadTracker(double progress, const char* target_address, struct l
     assert(isInitialized);
 
     const int x = INITIAL_X;
-    int y = INITIAL_Y;
+    int y = 20;
     // progress = 50;
     Paint_NewImage(s_fb, LCD_1IN54_WIDTH, LCD_1IN54_HEIGHT, 0, WHITE, 16);
     Paint_Clear(WHITE);
@@ -157,12 +157,17 @@ void UpdateLcd_roadTracker(double progress, const char* target_address, struct l
         snprintf(target_location_str, statBufferSize, "%.6f,%.6f", target_location.latitude, target_location.longitude);
     }
 
-    Paint_DrawString_EN(x, y, "Target Location:", &Font16, WHITE, BLACK);
+    Paint_DrawString_EN(x, y, "Target address:", &Font16, WHITE, BLACK);
     y += 20;
     Paint_DrawString_EN(x, y, target_address, &Font16, WHITE, BLACK);
-    y += 40;
+    y += 60;
 
-    Paint_DrawString_EN(x, y, "Current Location:", &Font16, WHITE, BLACK);
+    Paint_DrawString_EN(x, y, "Target coord:", &Font16, WHITE, BLACK);
+    y += 20;
+    Paint_DrawString_EN(x, y, target_location_str, &Font16, WHITE, BLACK);
+    y += 20;
+
+    Paint_DrawString_EN(x, y, "Current coord:", &Font16, WHITE, BLACK);
     y += 20;
     Paint_DrawString_EN(x, y, source_location_str, &Font16, WHITE, BLACK);
     y += 20;

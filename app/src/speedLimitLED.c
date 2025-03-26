@@ -43,7 +43,7 @@ static void* updateSpeedAndLEDThreadFunc(void* arg) {
             // Within limit -> Green
         }
         
-        printf("Current Speed: (gps) %.2f km/h\n", gps_speed_kmh);
+        // printf("Current Speed: (gps) %.2f km/h\n", gps_speed_kmh);
 
         sleepForMs(SAMPLING_PERIOD_MS);
         
