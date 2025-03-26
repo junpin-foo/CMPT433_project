@@ -67,18 +67,20 @@ static void* trackLocationThreadFunc(void* arg) {
     while (isRunning) {
         if (target_set) {
             struct location current_location  = GPS_getLocation();
-            // struct location current_location = {49.263239, -122.857701, -1};
+            // struct location current_location = {49.2792301304165, -122.79777156455295, -1};
             souruce_location.latitude = current_location.latitude;
             souruce_location.longitude = current_location.longitude;
             souruce_location.speed = current_location.speed;
             if (current_location.latitude == INVALID_LATITUDE) {
-                printf("Unable to check due to invalid data\n");
+                printf("Unable to get GPS data, GPS no Signal !\n");
             } else {
                 printf("Current Location: Latitude %.6f, Longitude: %.6f, Speed: %.6f \n", current_location.latitude, current_location.longitude, current_location.speed);
                 current_distance = haversine_distance(current_location, target_location);
                 if (totalDistanceNeeded > 0) {
                     progress = ((totalDistanceNeeded - current_distance) / totalDistanceNeeded) * 100;
-                    if (current_distance <= 0.05) { // If within 50 meters of target
+                    if (progress < 0) {
+                        progress = 0;
+                    } else if (current_distance <= 0.2) { // If within 200 meters of target
                         printf("Target reached. Resetting target.\n");
                         target_set = false;
                         progress = 100;
@@ -96,8 +98,8 @@ static void* trackLocationThreadFunc(void* arg) {
 // Function to set the target location
 void RoadTracker_setTarget(char *address) {
     assert(isInitialized);
-    // struct location temp_source_location  = GPS_getLocation();
-    struct location temp_source_location  = {49.255280, -122.811226, -1};
+    struct location temp_source_location  = GPS_getLocation();
+    // struct location temp_source_location  = {49.255280, -122.811226, -1};
     if (temp_source_location.latitude == INVALID_LATITUDE) {
         printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again !\n");
     } else {
