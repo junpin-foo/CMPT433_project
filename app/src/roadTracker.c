@@ -74,6 +74,7 @@ static void* trackLocationThreadFunc(void* arg) {
             if (current_location.latitude == INVALID_LATITUDE) {
                 printf("Unable to check due to invalid data\n");
             } else {
+                printf("Current Location: Latitude %.6f, Longitude: %.6f\n", current_location.latitude, current_location.longitude);
                 current_distance = haversine_distance(current_location, target_location);
                 if (totalDistanceNeeded > 0) {
                     progress = ((totalDistanceNeeded - current_distance) / totalDistanceNeeded) * 100;
@@ -82,7 +83,6 @@ static void* trackLocationThreadFunc(void* arg) {
                         target_set = false;
                         progress = 100;
                     }
-                    // printf("Distance to target: %.2f km | Progress: %.2f%%\n", current_distance, progress);
                 } else {
                     printf("Distance to target: %.2f km\n", current_distance);
                 }
