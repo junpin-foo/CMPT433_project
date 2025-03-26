@@ -31,16 +31,17 @@ static void* updateSpeedAndLEDThreadFunc(void* arg) {
         //compare speed to speed limit -> set LED
 
         // Get GPS reading 
+        // struct location current_location  = {49.191458, -122.817887, 65};
         struct location current_location = GPS_getLocation();
         double gps_speed_kmh = current_location.speed;
         speed_kmh = gps_speed_kmh;
 
-        if (gps_speed_kmh > speedLimit) {
-            // Over speed limit -> LED Red
-        } else if (gps_speed_kmh - speedLimit > 10) {
-            // 10km/h before over -> LED Yellow
+        if (gps_speed_kmh - speedLimit >= -5 && gps_speed_kmh - speedLimit <= 5) {
+            //yellow
+        } else if (gps_speed_kmh > speedLimit) {
+            //red
         } else {
-            // Within limit -> Green
+           //green
         }
         
         // printf("Current Speed: (gps) %.2f km/h\n", gps_speed_kmh);
@@ -55,11 +56,14 @@ static void* updateSpeedLimitFunc(void* arg) {
     (void)arg; // Suppress unused parameter warning
     while (isRunning) {
         // Get GPS reading 
-        // struct location current_location  = {-1000, -1000, -1};
+        // struct location current_location  = {49.191458, -122.817887, 65};
         struct location current_location = GPS_getLocation();
         // double gps_speed_kmh = current_location.speed;
 
-        speedLimit = get_speed_limit(current_location.latitude, current_location.longitude);
+        int speedLimitResp = get_speed_limit(current_location.latitude, current_location.longitude);
+        if(speedLimitResp > 0) {
+            speedLimit = speedLimitResp;
+        }
         printf("Speed Limit: %d km/h\n", speedLimit);
     
         sleepForMs(SAMPLING_PERIOD_MS);

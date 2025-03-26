@@ -122,13 +122,14 @@ void UpdateLcd_Speed(double gps_speed_kmh, int speed_limit)
     Paint_DrawString_EN(x + 80, y, limit_str, &Font20, WHITE, BLACK);
     y += NEXTLINE_Y;
     
-    if (gps_speed_kmh - speed_limit >= 10 || gps_speed_kmh - speed_limit <= -10) {
-            Paint_DrawRectangle(85, y, 130, y + 50, YELLOW, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-        } else if (gps_speed_kmh > speed_limit) {
+    if (gps_speed_kmh - speed_limit >= -5 && gps_speed_kmh - speed_limit <= 5) {
+        Paint_DrawRectangle(85, y, 130, y + 50, YELLOW, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    } else if (gps_speed_kmh > speed_limit) {
         Paint_DrawRectangle(85, y, 130, y + 50, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     } else {
         Paint_DrawRectangle(85, y, 130, y + 50, GREEN, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     }
+
 
     LCD_1IN54_Display(s_fb);
 }

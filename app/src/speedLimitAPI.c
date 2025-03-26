@@ -14,12 +14,6 @@ return
 -2 : Speed limit not found
 -3 : Unknown road type
 
-todo: 
-1. CHECK QUERY FOR ALL STREET TYPES BEFORE RETURNING NON FOUND
-2. INCREASE TIMEOUT
-3. FIX COLOUR
-4. KEEP CURRENT NUMBER UNTIL A NEW NOT ERROR IS FOUND
-5. BLUETOOTH
 */
 
 // Default speed limits based on road types
@@ -78,7 +72,7 @@ int get_speed_limit(double latitude, double longitude) {
 
     char query[512];
     snprintf(query, sizeof(query),
-             "[out:json];way(around:5,%.8f,%.8f)[\"highway\"];out body;", latitude, longitude);
+             "[out:json];way(around:10,%.8f,%.8f)[\"highway\"];out body;", latitude, longitude);
 
     curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
@@ -88,7 +82,7 @@ int get_speed_limit(double latitude, double longitude) {
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, query);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 15L);
 
         res = curl_easy_perform(curl);
 
@@ -131,14 +125,11 @@ int get_speed_limit(double latitude, double longitude) {
                                     curl_global_cleanup();
                                     return estimated_speed;
                                 }
-                                else {
-                                    printf("Road type not found (%s)\n", highway->valuestring);
-                                    return estimated_speed;
-                                }
                             }
                         }
                     }
                 }
+                printf("Not maxSpeed or valid Road type found\n");
                 cJSON_Delete(json);
             }
         }
