@@ -8,6 +8,13 @@
 
 #define OVERPASS_API_URL "https://overpass-api.de/api/interpreter"
 
+/*
+return 
+-1 : memory error
+-2 : Speed limit not found
+-3 : Unknown road type
+*/
+
 // Default speed limits based on road types
 static int estimate_speed_limit(const char *highway_type) {
     if (strcmp(highway_type, "motorway") == 0) return 90;
@@ -24,7 +31,7 @@ static int estimate_speed_limit(const char *highway_type) {
     if (strcmp(highway_type, "residential") == 0) return 30;
     if (strcmp(highway_type, "living_street") == 0) return 30;
 
-    return -1; // Unknown road type (default 50) was -1
+    return -3; // Unknown road type (default 50) was -3
 }
 
 struct MemoryStruct {
@@ -129,5 +136,5 @@ int get_speed_limit(double latitude, double longitude) {
     }
     curl_global_cleanup();
     free(chunk.memory);
-    return -1; // Speed limit not found (default 50) was -1
+    return -2; // Speed limit not found (default 50) was -2
 }

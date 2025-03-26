@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "hal/GPS.h"
+#include "sleep_and_timer.h"
 int serial_port;
 
 static char* GPS_read();
@@ -81,7 +82,7 @@ static char* GPS_read() {
                 return read_buf;
             }
         }
-        sleep(1);
+        sleepForMs(100);
     }
 }
 
@@ -89,7 +90,6 @@ static struct location parse_GPRMC(char* gnrmc_sentence) {
     char *token;
     char temp[255];
     struct location data = {-1000, -1000, -1};
-
     struct location invalidData = {INVALID_LATITUDE, INVALID_LONGITUDE, INVALID_SPEED};
     // Make a copy to avoid modifying the original
     strcpy(temp, gnrmc_sentence);
