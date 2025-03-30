@@ -4,6 +4,16 @@
 
 #include <zephyr/dt-bindings/gpio/gpio.h>
 
+/*
+ * Can't delete this ! Otherwise when reading GPS data in linux will break the R5 code
+ */ 
+&uart0 {
+    status = "disabled";  // Disable UART0 (ttyAMA0)
+};
+
+&uart1 {
+    status = "disabled";
+};
  / {
     aliases {
         led0 = &mcu_led;

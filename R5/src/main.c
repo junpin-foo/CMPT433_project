@@ -162,54 +162,7 @@ int main(void)
 		gpio_pin_set_dt(&neopixel, 0);
 		NEO_DELAY_RESET();
 		// Keep looping in case we plug in NeoPixel later
-		k_busy_wait(500000);
-
-		// gpio_pin_set_dt(&neopixel, 0);
-		// DELAY_NS(NEO_RESET_NS);
-		// for(int j = 0; j < NEO_NUM_LEDS; j++) {
-		// 	for(int i = 31; i >= 0; i--) {
-		// 		if(color[j] & ((uint32_t)0x1 << i)) {
-		// 			gpio_pin_set_dt(&neopixel, 1);
-		// 			NEO_DELAY_ONE_ON();
-		// 			gpio_pin_set_dt(&neopixel, 0);
-		// 			NEO_DELAY_ONE_OFF();
-		// 		} else {
-		// 			gpio_pin_set_dt(&neopixel, 1);
-		// 			NEO_DELAY_ZERO_ON();
-		// 			gpio_pin_set_dt(&neopixel, 0);
-		// 			NEO_DELAY_ZERO_OFF();
-		// 		}
-		// 	}
-		// }
-
-		// gpio_pin_set_dt(&neopixel, 0);
-		// NEO_DELAY_RESET();
-		// // Keep looping in case we plug in NeoPixel later
-		// k_busy_wait(500000);
-
-		// gpio_pin_set_dt(&neopixel, 0);
-		// DELAY_NS(NEO_RESET_NS);
-
-		// for(int j = 0; j < NEO_NUM_LEDS; j++) {
-		// 	for(int i = 31; i >= 0; i--) {
-		// 		if(color2[j] & ((uint32_t)0x1 << i)) {
-		// 			gpio_pin_set_dt(&neopixel, 1);
-		// 			NEO_DELAY_ONE_ON();
-		// 			gpio_pin_set_dt(&neopixel, 0);
-		// 			NEO_DELAY_ONE_OFF();
-		// 		} else {
-		// 			gpio_pin_set_dt(&neopixel, 1);
-		// 			NEO_DELAY_ZERO_ON();
-		// 			gpio_pin_set_dt(&neopixel, 0);
-		// 			NEO_DELAY_ZERO_OFF();
-		// 		}
-		// 	}
-		// }
-
-		// gpio_pin_set_dt(&neopixel, 0);
-		// NEO_DELAY_RESET();
-		// // Keep looping in case we plug in NeoPixel later
-		// k_busy_wait(500000);
+		k_busy_wait(10000);
 	}
 	return 0;
 }

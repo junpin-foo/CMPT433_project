@@ -65,8 +65,12 @@ void* LED_thread(void* arg)
 {
     (void)arg; // Mark the parameter as unused
     volatile void *pR5Base = getR5MmapAddr();
+    // int progress = 0;
     while (true) {
-        int progress = RoadTracker_getProgress()/12.5 ;
+        // progress = (progress + 1)%9;
+        int progress = RoadTracker_getProgress();
+        // int progress = 7;
+        // printf("    %15s: 0x%04x\n", "progress", MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET));
         MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET) = progress;
         sleepForMs(1000);
     }
