@@ -13,6 +13,7 @@
 #include "hal/joystick.h"
 #include "hal/microphone.h"
 #include "hal/rotary_state.h"
+#include "LED.h"
 
 
 int main() {
@@ -26,11 +27,13 @@ int main() {
     SpeedLED_init();
     StreetAPI_init();
     RoadTracker_init();
-    RoadTracker_setTarget("13450 102 Ave #250, Surrey, BC V3T 0A3");
+    // RoadTracker_setTarget("13450 102 Ave #250, Surrey, BC V3T 0A3");
+    LED_init();
     while(1){
         sleepForMs(1000);
     }
     // Cleanup resources
+    LED_cleanup();
     RoadTracker_cleanup();
     StreetAPI_cleanup();
     Ic2_cleanUp();

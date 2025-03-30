@@ -18,6 +18,7 @@ static bool isInitialized = false;
 
 static struct location target_location = {INVALID_LATITUDE, INVALID_LONGITUDE, -1};
 static struct location souruce_location = {INVALID_LATITUDE, INVALID_LONGITUDE, -1};
+static struct location current_location = {INVALID_LATITUDE, INVALID_LONGITUDE, -1};
 static bool target_set = false;
 static void* trackLocationThreadFunc(void* arg);
 static double totalDistanceNeeded = -1;
@@ -66,12 +67,9 @@ static void* trackLocationThreadFunc(void* arg) {
     (void)arg; // Suppress unused parameter warning
     while (isRunning) {
         if (target_set) {
-            struct location current_location  = GPS_getLocation();
-            // struct location current_location = {49.2792301304165, -122.79777156455295, -1};
-            souruce_location.latitude = current_location.latitude;
-            souruce_location.longitude = current_location.longitude;
-            souruce_location.speed = current_location.speed;
+            current_location  = GPS_getLocation();
             if (current_location.latitude == INVALID_LATITUDE) {
+                progress = 0;
                 printf("Unable to get GPS data, GPS no Signal !\n");
             } else {
                 printf("Current Location: Latitude %.6f, Longitude: %.6f, Speed: %.6f \n", current_location.latitude, current_location.longitude, current_location.speed);
@@ -80,8 +78,7 @@ static void* trackLocationThreadFunc(void* arg) {
                     progress = ((totalDistanceNeeded - current_distance) / totalDistanceNeeded) * 100;
                     if (progress < 0) {
                         progress = 0;
-                    } else if (current_distance <= 0.2) { // If within 200 meters of target
-                        printf("Target reached. Resetting target.\n");
+                    } else if (current_distance <= 0.1) { // If within 100 meters of target
                         target_set = false;
                         progress = 100;
                     }
@@ -96,12 +93,12 @@ static void* trackLocationThreadFunc(void* arg) {
 }
 // Expecting to be call from microphone
 // Function to set the target location
-void RoadTracker_setTarget(char *address) {
+bool RoadTracker_setTarget(char *address) {
     assert(isInitialized);
     struct location temp_source_location  = GPS_getLocation();
-    // struct location temp_source_location  = {49.255280, -122.811226, -1};
     if (temp_source_location.latitude == INVALID_LATITUDE) {
         printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again !\n");
+        return false;
     } else {
         strncpy(target_address, address, sizeof(target_address) - 1);
         target_address[sizeof(target_address) - 1] = '\0'; // Ensure null termination
@@ -112,11 +109,16 @@ void RoadTracker_setTarget(char *address) {
         totalDistanceNeeded = haversine_distance(souruce_location, target_location);
         target_set = true;
         printf("Target set to: Latitude %.6f, Longitude %.6f | Source Location: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, souruce_location.latitude, souruce_location.longitude, totalDistanceNeeded);
+        return true;
     }
 }
 
 
 struct location RoadTracker_getSourceLocation(void) {
+    return souruce_location;
+}
+
+struct location RoadTracker_getCurrentLocation(void) {
     return souruce_location;
 }
 

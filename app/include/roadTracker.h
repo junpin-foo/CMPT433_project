@@ -9,8 +9,11 @@
 #include "streetAPI.h"
 
 void RoadTracker_init();
-void RoadTracker_setTarget(char* address);
+bool RoadTracker_setTarget(char* address);
 void RoadTracker_cleanup();
+
+// Function to get the current location
+struct location RoadTracker_getCurrentLocation();
 
 struct location RoadTracker_getSourceLocation();
 // Function to get the target location
