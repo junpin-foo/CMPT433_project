@@ -88,6 +88,18 @@ int main(void)
         0x0f0f0000, // Yellow
         0x000f0f00, // Purple
         0x0f000f00, // Teal
+    }; 
+
+	uint32_t color2[NEO_NUM_LEDS] = {
+		// Normal
+        // 0x0f000000, // Green
+        // 0x000f0000, // Red
+        // 0x00000f00, // Blue
+        // 0x0000000f, // White
+        // 0x0f0f0f00, // White (via RGB)
+        // 0x0f0f0000, // Yellow
+        // 0x000f0f00, // Purple
+        // 0x0f000f00, // Teal
 
         // Try these; they are birght! 
         // (You'll need to comment out some of the above)
@@ -99,32 +111,105 @@ int main(void)
         // 0x00ff00ff, // Red Bright w/ Bright White
         // 0x0000ffff, // Blue Bright w/ Bright White
         // 0xffffffff, // White w/ Bright White
+
+		// OFF
+		0x00000000, // Green Bright
+        0x00000000, // Red Bright
+        0x00000000, // Blue Bright
+        0x00000000, // White
+        0x00000000, // Green Bright w/ Bright White
+        0x00000000, // Red Bright w/ Bright White
+        0x00000000, // Blue Bright w/ Bright White
+        0x00000000, // White w/ Bright White
     }; 
 
 	pR5Base = (volatile void *) SHARED_MEM_BTCM_START;
 	while (true) {
 		gpio_pin_set_dt(&neopixel, 0);
 		DELAY_NS(NEO_RESET_NS);
-		uint32_t progress_raw = MEM_UINT32(pR5Base + PROGRESS_OFFSET);
+		int progress_raw = MEM_UINT32(pR5Base + PROGRESS_OFFSET) - 1;
 		for(int j = 0; j < NEO_NUM_LEDS; j++) {
-			for(int i = 31; i >= 0; i--) {
-				if((color[j] & ((uint32_t)0x1 << i )) && ((j * 10) < progress_raw)) {
-					gpio_pin_set_dt(&neopixel, 1);
-					NEO_DELAY_ONE_ON();
-					gpio_pin_set_dt(&neopixel, 0);
-					NEO_DELAY_ONE_OFF();
-				} else {
-					gpio_pin_set_dt(&neopixel, 1);
-					NEO_DELAY_ZERO_ON();
-					gpio_pin_set_dt(&neopixel, 0);
-					NEO_DELAY_ZERO_OFF();
+			if (j <= progress_raw) {
+				for(int i = 31; i >= 0; i--) {
+					if((0x000f0000 & (uint32_t)0x1 << i)) {
+						gpio_pin_set_dt(&neopixel, 1);
+						NEO_DELAY_ONE_ON();
+						gpio_pin_set_dt(&neopixel, 0);
+						NEO_DELAY_ONE_OFF();
+					} else {
+						gpio_pin_set_dt(&neopixel, 1);
+						NEO_DELAY_ZERO_ON();
+						gpio_pin_set_dt(&neopixel, 0);
+						NEO_DELAY_ZERO_OFF();
+					}
+				}
+			} else {
+				for(int i = 31; i >= 0; i--) {
+					if((0x0000000f & (uint32_t)0x1 << i)) {
+						gpio_pin_set_dt(&neopixel, 1);
+						NEO_DELAY_ONE_ON();
+						gpio_pin_set_dt(&neopixel, 0);
+						NEO_DELAY_ONE_OFF();
+					} else {
+						gpio_pin_set_dt(&neopixel, 1);
+						NEO_DELAY_ZERO_ON();
+						gpio_pin_set_dt(&neopixel, 0);
+						NEO_DELAY_ZERO_OFF();
+					}
 				}
 			}
 		}
 		gpio_pin_set_dt(&neopixel, 0);
 		NEO_DELAY_RESET();
 		// Keep looping in case we plug in NeoPixel later
-		k_busy_wait(1000);
+		k_busy_wait(500000);
+
+		// gpio_pin_set_dt(&neopixel, 0);
+		// DELAY_NS(NEO_RESET_NS);
+		// for(int j = 0; j < NEO_NUM_LEDS; j++) {
+		// 	for(int i = 31; i >= 0; i--) {
+		// 		if(color[j] & ((uint32_t)0x1 << i)) {
+		// 			gpio_pin_set_dt(&neopixel, 1);
+		// 			NEO_DELAY_ONE_ON();
+		// 			gpio_pin_set_dt(&neopixel, 0);
+		// 			NEO_DELAY_ONE_OFF();
+		// 		} else {
+		// 			gpio_pin_set_dt(&neopixel, 1);
+		// 			NEO_DELAY_ZERO_ON();
+		// 			gpio_pin_set_dt(&neopixel, 0);
+		// 			NEO_DELAY_ZERO_OFF();
+		// 		}
+		// 	}
+		// }
+
+		// gpio_pin_set_dt(&neopixel, 0);
+		// NEO_DELAY_RESET();
+		// // Keep looping in case we plug in NeoPixel later
+		// k_busy_wait(500000);
+
+		// gpio_pin_set_dt(&neopixel, 0);
+		// DELAY_NS(NEO_RESET_NS);
+
+		// for(int j = 0; j < NEO_NUM_LEDS; j++) {
+		// 	for(int i = 31; i >= 0; i--) {
+		// 		if(color2[j] & ((uint32_t)0x1 << i)) {
+		// 			gpio_pin_set_dt(&neopixel, 1);
+		// 			NEO_DELAY_ONE_ON();
+		// 			gpio_pin_set_dt(&neopixel, 0);
+		// 			NEO_DELAY_ONE_OFF();
+		// 		} else {
+		// 			gpio_pin_set_dt(&neopixel, 1);
+		// 			NEO_DELAY_ZERO_ON();
+		// 			gpio_pin_set_dt(&neopixel, 0);
+		// 			NEO_DELAY_ZERO_OFF();
+		// 		}
+		// 	}
+		// }
+
+		// gpio_pin_set_dt(&neopixel, 0);
+		// NEO_DELAY_RESET();
+		// // Keep looping in case we plug in NeoPixel later
+		// k_busy_wait(500000);
 	}
 	return 0;
 }
