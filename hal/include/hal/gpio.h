@@ -42,4 +42,13 @@ int Gpio_waitFor2LineChange(
 
 void Gpio_close(struct GpioLine* line);
 
+// Needed to work with sameer's rotary encoder code
+bool Gpio_isInitialized(void);
+
+// Needed to work with sameer's rotary encoder code
+int Gpio_getLineValue(struct GpioLine* line);
+
+// Needed to work with sameer's rotary encoder code
+int Gpio_waitForLineChange(struct GpioLine* line, struct gpiod_line_bulk* bulkEvents);
+
 #endif

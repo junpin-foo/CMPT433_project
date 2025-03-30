@@ -11,6 +11,9 @@
 #include "updateLcd.h"
 #include "hal/gpio.h"
 #include "hal/joystick.h"
+#include "hal/microphone.h"
+#include "hal/rotary_state.h"
+
 
 int main() {
     Ic2_initialize();
@@ -36,4 +39,38 @@ int main() {
     Accelerometer_cleanUp();
     return 0;
 }
+
+
+
+// // Flag to control program execution
+// static int running = 1;
+
+// int main() {
+//     Gpio_initialize();
+//     RotaryState_init();
+//     Microphone_init();
+
+    
+//     // Start the button listener thread
+//     if (Microphone_startButtonListener() == 0) {
+//         printf("Button listener started. Press the rotary encoder button to record audio.\n");
+//     } else {
+//         printf("Failed to start button listener.\n");
+//     }
+    
+//     // Main loop
+//     while (running) {
+        
+//         sleep(1);
+//     }
+    
+//     // Cleanup and exit
+//     Microphone_stopButtonListener();
+//     Microphone_cleanup();
+//     RotaryState_cleanup();
+//     Gpio_cleanup();
+    
+//     printf("Exiting...\n");
+//     return 0;
+// }
 
