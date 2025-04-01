@@ -15,4 +15,6 @@ int SpeedLED_getSpeedLimit(void);
 
 double SpeedLED_getSpeed(void);
 
+int SpeedLED_getLEDColor(void);
+
 #endif

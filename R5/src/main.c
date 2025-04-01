@@ -128,10 +128,22 @@ int main(void)
 		gpio_pin_set_dt(&neopixel, 0);
 		DELAY_NS(NEO_RESET_NS);
 		int progress_raw = MEM_UINT32(pR5Base + PROGRESS_OFFSET) - 1;
+		int colorCode = MEM_UINT32(pR5Base + COLOR_OFFSET);
+
+		// Changing Color
+		uint32_t currentColor =0x0000000f;
+		if (colorCode == 0) {
+			currentColor =0x000f0000; //RED
+		} else if (colorCode == 1) {
+			currentColor =0x0f0f0000; //YELLOW
+		} else {
+			currentColor =0x0f000000; //GREEN
+		}
+
 		for(int j = 0; j < NEO_NUM_LEDS; j++) {
 			if (j <= progress_raw) {
 				for(int i = 31; i >= 0; i--) {
-					if((0x000f0000 & (uint32_t)0x1 << i)) {
+					if((currentColor & (uint32_t)0x1 << i)) {
 						gpio_pin_set_dt(&neopixel, 1);
 						NEO_DELAY_ONE_ON();
 						gpio_pin_set_dt(&neopixel, 0);
@@ -145,7 +157,7 @@ int main(void)
 				}
 			} else {
 				for(int i = 31; i >= 0; i--) {
-					if((0x0000000f & (uint32_t)0x1 << i)) {
+					if((0x0f0f0f00 & (uint32_t)0x1 << i)) {
 						gpio_pin_set_dt(&neopixel, 1);
 						NEO_DELAY_ONE_ON();
 						gpio_pin_set_dt(&neopixel, 0);

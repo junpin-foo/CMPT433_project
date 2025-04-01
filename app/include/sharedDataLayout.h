@@ -12,6 +12,8 @@
 #define MSG_OFFSET 0
 #define MSG_SIZE   32
 #define PROGRESS_OFFSET (MSG_OFFSET + sizeof(uint32_t))
+#define COLOR_OFFSET (PROGRESS_OFFSET + sizeof(uint32_t))
+
 
 #define MEM_UINT8(addr) *(uint8_t*)(addr)
 #define MEM_UINT32(addr) *(uint32_t*)(addr)

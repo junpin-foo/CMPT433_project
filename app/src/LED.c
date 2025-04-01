@@ -13,6 +13,7 @@
 #include <math.h>
 #include <pthread.h>
 #include <roadTracker.h>
+#include <speedLimitLED.h>
 
 #include "sharedDataLayout.h"
 
@@ -69,9 +70,12 @@ void* LED_thread(void* arg)
     while (true) {
         // progress = (progress + 1)%9;
         int progress = RoadTracker_getProgress();
+        int color = SpeedLED_getLEDColor();
         // int progress = 7;
         // printf("    %15s: 0x%04x\n", "progress", MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET));
         MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET) = progress;
+        printf("color: %d\n", color);
+        MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = color;
         sleepForMs(1000);
     }
     // return NULL;

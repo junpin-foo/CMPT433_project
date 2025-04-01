@@ -19,7 +19,7 @@ static bool isInitialized = false;
 #define SAMPLING_PERIOD_MS 100  // 100ms sampling period
 double speed_kmh = 0.0; 
 int speedLimit = 0;
-
+int led_color = 2; //0: red, 1: yellow, 2: green
 
 static void* updateSpeedAndLEDThreadFunc(void* arg) {
     (void)arg; // Suppress unused parameter warning
@@ -37,11 +37,11 @@ static void* updateSpeedAndLEDThreadFunc(void* arg) {
         speed_kmh = gps_speed_kmh;
 
         if (gps_speed_kmh - speedLimit >= -5 && gps_speed_kmh - speedLimit <= 5) {
-            //yellow
+            led_color = 1;//yellow
         } else if (gps_speed_kmh > speedLimit) {
-            //red
+            led_color = 0;//red
         } else {
-           //green
+           led_color = 2;//green
         }
         
         // printf("Current Speed: (gps) %.2f km/h\n", gps_speed_kmh);
@@ -97,4 +97,9 @@ int SpeedLED_getSpeedLimit(void) {
 double SpeedLED_getSpeed(void) {
     assert(isInitialized);
     return speed_kmh;
+}
+
+int SpeedLED_getLEDColor(void) {
+    assert(isInitialized);
+    return led_color;
 }
