@@ -42,6 +42,7 @@ static char limit_str[statBufferSize];
 static char progress_str[statBufferSize];
 static char source_location_str[statBufferSize];
 static char target_location_str[statBufferSize];
+static char current_location_str[statBufferSize];
 
 static pthread_t outputThread;
 static bool isRunning = false;
@@ -95,7 +96,7 @@ static void* UpdateLcdThread(void* args) {
         if (Joystick_getPageCount() == 1) {
             UpdateLcd_Speed(SpeedLED_getSpeed(), SpeedLED_getSpeedLimit());
         } else {
-            UpdateLcd_roadTracker(RoadTracker_getProgress(), RoadTracker_getTargetAddress(), RoadTracker_getCurrentLocation(), RoadTracker_getTargetLocation());
+            UpdateLcd_roadTracker(RoadTracker_getProgress(), RoadTracker_getTargetAddress(), RoadTracker_getCurrentLocation(), RoadTracker_getTargetLocation(), RoadTracker_getCurrentLocation());
         }
         sleepForMs(SLEEP_MS);
     }
@@ -134,7 +135,7 @@ void UpdateLcd_Speed(double gps_speed_kmh, int speed_limit)
     LCD_1IN54_Display(s_fb);
 }
 
-void UpdateLcd_roadTracker(double progress, const char* target_address, struct location source_location, struct location target_location)
+void UpdateLcd_roadTracker(double progress, const char* target_address, struct location source_location, struct location target_location, struct location current_location)
 {
     assert(isInitialized);
 
@@ -156,19 +157,35 @@ void UpdateLcd_roadTracker(double progress, const char* target_address, struct l
         snprintf(target_location_str, statBufferSize, "%.6f,%.6f", target_location.latitude, target_location.longitude);
     }
 
+    if (current_location.latitude == -1000 || current_location.longitude == -1000) {
+        snprintf(current_location_str, statBufferSize, "UNKNOWN");
+    } else {
+        snprintf(current_location_str, statBufferSize, "%.6f,%.6f", source_location.latitude, source_location.longitude);
+    }
+
     Paint_DrawString_EN(x, y, "Target address:", &Font16, WHITE, BLACK);
     y += 20;
-    Paint_DrawString_EN(x, y, target_address, &Font16, WHITE, BLACK);
+    if (strlen(target_address) == 0) {
+        Paint_DrawString_EN(x, y, "UNKNOWN", &Font16, WHITE, BLACK);
+    } else {
+        Paint_DrawString_EN(x, y, target_address, &Font16, WHITE, BLACK);
+    }
     y += 60;
 
-    Paint_DrawString_EN(x, y, "Target coord:", &Font16, WHITE, BLACK);
+    Paint_DrawString_EN(x, y, "Target coordinate:", &Font16, WHITE, BLACK);
     y += 20;
     Paint_DrawString_EN(x, y, target_location_str, &Font16, WHITE, BLACK);
     y += 20;
 
-    Paint_DrawString_EN(x, y, "Current coord:", &Font16, WHITE, BLACK);
+        
+    Paint_DrawString_EN(x, y, "Source coordinate:", &Font16, WHITE, BLACK);
     y += 20;
-    Paint_DrawString_EN(x, y, source_location_str, &Font16, WHITE, BLACK);
+    Paint_DrawString_EN(x, y, current_location_str, &Font16, WHITE, BLACK);
+    y += 20;
+    
+    Paint_DrawString_EN(x, y, "Current coordinate:", &Font16, WHITE, BLACK);
+    y += 20;
+    Paint_DrawString_EN(x, y, current_location_str, &Font16, WHITE, BLACK);
     y += 20;
 
     Paint_DrawString_EN(x, y, "Progress:", &Font16, WHITE, BLACK);

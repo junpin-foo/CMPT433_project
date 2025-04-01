@@ -113,7 +113,6 @@ bool RoadTracker_setTarget(char *address) {
     }
 }
 
-
 struct location RoadTracker_getSourceLocation(void) {
     return souruce_location;
 }
