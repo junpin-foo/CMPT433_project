@@ -78,7 +78,7 @@ static void* trackLocationThreadFunc(void* arg) {
                     progress = ((totalDistanceNeeded - current_distance) / totalDistanceNeeded) * 100;
                     if (progress < 0) {
                         progress = 0;
-                    } else if (current_distance <= 0.1) { // If within 100 meters of target
+                    } else if (current_distance <= 0.2) { // If within 200 meters of target
                         target_set = false;
                         progress = 100;
                     }

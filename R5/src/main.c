@@ -136,8 +136,25 @@ int main(void)
 			currentColor =0x000f0000; //RED
 		} else if (colorCode == 1) {
 			currentColor =0x0f0f0000; //YELLOW
-		} else {
+		} else if (colorCode == 2) {
 			currentColor =0x0f000000; //GREEN
+		} else if (colorCode == 3) {
+			for(int j = 0; j < NEO_NUM_LEDS; j++) {
+				for(int i = 31; i >= 0; i--) {
+					if((0x000f0f00 & (uint32_t)0x1 << i)) {
+						gpio_pin_set_dt(&neopixel, 1);
+						NEO_DELAY_ONE_ON();
+						gpio_pin_set_dt(&neopixel, 0);
+						NEO_DELAY_ONE_OFF();
+					} else {
+						gpio_pin_set_dt(&neopixel, 1);
+						NEO_DELAY_ZERO_ON();
+						gpio_pin_set_dt(&neopixel, 0);
+						NEO_DELAY_ZERO_OFF();
+					}
+				}
+			}
+			continue;
 		}
 
 		for(int j = 0; j < NEO_NUM_LEDS; j++) {

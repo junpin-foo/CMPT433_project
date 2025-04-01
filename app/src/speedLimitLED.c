@@ -35,8 +35,9 @@ static void* updateSpeedAndLEDThreadFunc(void* arg) {
         struct location current_location = GPS_getLocation();
         double gps_speed_kmh = current_location.speed;
         speed_kmh = gps_speed_kmh;
-
-        if (gps_speed_kmh - speedLimit >= -5 && gps_speed_kmh - speedLimit <= 5) {
+        if (current_location.latitude == INVALID_LATITUDE) {
+            led_color = 3;
+        } else if (gps_speed_kmh - speedLimit >= -5 && gps_speed_kmh - speedLimit <= 5) {
             led_color = 1;//yellow
         } else if (gps_speed_kmh > speedLimit) {
             led_color = 0;//red
