@@ -12,6 +12,6 @@ void UpdateLcd_init();
 void UpdateLcd_cleanup();
 void UpdateLcd_Speed(double gps_speed_kmh, int speed_limit);
 void UpdateLcd_Speed(double gps_speed_kmh, int speed_limit);
-void UpdateLcd_roadTracker(double progress, const char* target_address, struct location source_location, struct location target_location, struct location current_location);
+void UpdateLcd_roadTracker(double progress, const char* target_address, struct location source_location, struct location target_location, struct location current_location, int speed_limit);
 
 #endif

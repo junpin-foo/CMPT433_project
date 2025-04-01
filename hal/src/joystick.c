@@ -32,6 +32,7 @@ struct GpioLine* s_line = NULL;
 static int i2c_file_desc = -1;
 static bool isInitialized = false;
 static atomic_int page_number = 1;
+static atomic_int isButtonPressed = 0;
 
 static pthread_t button_thread;
 static volatile bool keepReading = false;
@@ -88,8 +89,12 @@ void *joystick_button_thread_func(void *arg) {
 
         if (buttonFlag && time_diff_ms(&last_btn_time, &now) > DEBOUNCE_TIME_MS) {
             int new_page = atomic_load(&page_number) % 2 + 1;
+            atomic_store(&isButtonPressed, 1);
             atomic_store(&page_number, new_page);
-            // printf("Button pressed, page number: %d\n", new_page);
+            printf("Button pressed");
+            last_btn_time = now;
+        } else {
+            atomic_store(&isButtonPressed, 0);
             last_btn_time = now;
         }
 
@@ -144,4 +149,8 @@ struct JoystickData Joystick_getReading() {
 
 int Joystick_getPageCount() {
     return page_number;
+}
+
+int Joystick_isButtonPressed() {
+    return isButtonPressed;
 }

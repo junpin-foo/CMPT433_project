@@ -24,6 +24,7 @@
 
 static bool isInitialized = false;
 static pthread_t LEDpthread;
+static bool isRunning = false;
 
 void* LED_thread(void* arg);
 
@@ -54,7 +55,7 @@ void LED_init(void)
 {
     assert(!isInitialized);
     isInitialized = true;
-
+    isRunning = true;
     if (pthread_create(&LEDpthread, NULL, LED_thread, NULL) != 0) {
         perror("Failed to create accelerometer thread");
         exit(EXIT_FAILURE);
@@ -67,7 +68,7 @@ void* LED_thread(void* arg)
     (void)arg; // Mark the parameter as unused
     volatile void *pR5Base = getR5MmapAddr();
     // int progress = 0;
-    while (true) {
+    while (isRunning) {
         // progress = (progress + 1)%9;
         int progress = RoadTracker_getProgress();
         int color = SpeedLED_getLEDColor();
@@ -78,12 +79,14 @@ void* LED_thread(void* arg)
         MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = color;
         sleepForMs(1000);
     }
-    // return NULL;
+    MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = 4;
+    return NULL;
 }
 
-void LED_cleanup(void)
+void LED_cleanup()
 {
     assert(isInitialized);
+    isRunning = false;
     pthread_join(LEDpthread, NULL);
     isInitialized = false;
 }

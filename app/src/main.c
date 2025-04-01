@@ -23,23 +23,32 @@ int main() {
     Joystick_initialize();
     Accelerometer_initialize();
     GPS_init();
-    UpdateLcd_init();
     SpeedLED_init();
     StreetAPI_init();
     RoadTracker_init();
     // RoadTracker_setTarget("13450 102 Ave #250, Surrey, BC V3T 0A3");
     LED_init();
-    while(1){
-        sleepForMs(1000);
+    UpdateLcd_init();
+
+    while (true) {
+        if (Joystick_isButtonPressed()) {
+            // Handle joystick button press
+            break;
+        } 
+        sleepForMs(100);
     }
+
     // Cleanup resources
+    UpdateLcd_cleanup();
     LED_cleanup();
     RoadTracker_cleanup();
     StreetAPI_cleanup();
+    SpeedLED_cleanup();
+    GPS_cleanup();
+    Accelerometer_cleanUp();
     Ic2_cleanUp();
     Joystick_cleanUp();
     Gpio_cleanup();
-    Accelerometer_cleanUp();
     return 0;
 }
 

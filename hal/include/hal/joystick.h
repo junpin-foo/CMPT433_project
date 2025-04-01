@@ -44,4 +44,6 @@ int Joystick_getPageCount();
 
 // Return the current Joystick Direction
 JoystickDirection getJoystickDirection(void);
+
+int Joystick_isButtonPressed();
 #endif

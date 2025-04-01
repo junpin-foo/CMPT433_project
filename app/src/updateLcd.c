@@ -93,11 +93,12 @@ static void* UpdateLcdThread(void* args) {
     (void) args;
     assert(isInitialized);
     while (isRunning) {
-        if (Joystick_getPageCount() == 1) {
-            UpdateLcd_Speed(SpeedLED_getSpeed(), SpeedLED_getSpeedLimit());
-        } else {
-            UpdateLcd_roadTracker(RoadTracker_getProgress(), RoadTracker_getTargetAddress(), RoadTracker_getCurrentLocation(), RoadTracker_getTargetLocation(), RoadTracker_getCurrentLocation());
-        }
+        // if (Joystick_getPageCount() == 1) {
+        //     UpdateLcd_Speed(SpeedLED_getSpeed(), SpeedLED_getSpeedLimit());
+        // } else {
+        //     UpdateLcd_roadTracker(RoadTracker_getProgress(), RoadTracker_getTargetAddress(), RoadTracker_getCurrentLocation(), RoadTracker_getTargetLocation(), RoadTracker_getCurrentLocation());
+        // }
+        UpdateLcd_roadTracker(RoadTracker_getProgress(), RoadTracker_getTargetAddress(), RoadTracker_getCurrentLocation(), RoadTracker_getTargetLocation(), RoadTracker_getCurrentLocation(), SpeedLED_getSpeedLimit());
         sleepForMs(SLEEP_MS);
     }
     return NULL;
@@ -108,7 +109,7 @@ void UpdateLcd_Speed(double gps_speed_kmh, int speed_limit)
     assert(isInitialized);
 
     const int x = INITIAL_X;
-    int y = INITIAL_Y;
+    int y = 30;
 
     Paint_NewImage(s_fb, LCD_1IN54_WIDTH, LCD_1IN54_HEIGHT, 0, WHITE, 16);
     Paint_Clear(WHITE);
@@ -135,12 +136,12 @@ void UpdateLcd_Speed(double gps_speed_kmh, int speed_limit)
     LCD_1IN54_Display(s_fb);
 }
 
-void UpdateLcd_roadTracker(double progress, const char* target_address, struct location source_location, struct location target_location, struct location current_location)
+void UpdateLcd_roadTracker(double progress, const char* target_address, struct location source_location, struct location target_location, struct location current_location, int speed_limit)
 {
     assert(isInitialized);
 
     const int x = INITIAL_X;
-    int y = 20;                                         
+    int y = 0;                                         
     Paint_NewImage(s_fb, LCD_1IN54_WIDTH, LCD_1IN54_HEIGHT, 0, WHITE, 16);
     Paint_Clear(WHITE);
     sprintf(progress_str, "%.1f%%", progress);
@@ -170,14 +171,14 @@ void UpdateLcd_roadTracker(double progress, const char* target_address, struct l
     } else {
         Paint_DrawString_EN(x, y, target_address, &Font16, WHITE, BLACK);
     }
-    y += 60;
+    y += 45;
 
     Paint_DrawString_EN(x, y, "Target coordinate:", &Font16, WHITE, BLACK);
     y += 20;
     Paint_DrawString_EN(x, y, target_location_str, &Font16, WHITE, BLACK);
     y += 20;
 
-        
+    
     Paint_DrawString_EN(x, y, "Source coordinate:", &Font16, WHITE, BLACK);
     y += 20;
     Paint_DrawString_EN(x, y, current_location_str, &Font16, WHITE, BLACK);
@@ -186,6 +187,15 @@ void UpdateLcd_roadTracker(double progress, const char* target_address, struct l
     Paint_DrawString_EN(x, y, "Current coordinate:", &Font16, WHITE, BLACK);
     y += 20;
     Paint_DrawString_EN(x, y, current_location_str, &Font16, WHITE, BLACK);
+    y += 20;
+
+    if (speed_limit > 0) {
+        snprintf(limit_str, statBufferSize, "%d km/h", speed_limit);
+    } else {
+        snprintf(limit_str, statBufferSize, "UNKNOWN");
+    }
+    Paint_DrawString_EN(x, y, "Speed Limit:", &Font16, WHITE, BLACK);
+    Paint_DrawString_EN(x + 130, y, limit_str, &Font16, WHITE, BLACK);
     y += 20;
 
     Paint_DrawString_EN(x, y, "Progress:", &Font16, WHITE, BLACK);

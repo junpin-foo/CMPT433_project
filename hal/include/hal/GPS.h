@@ -11,6 +11,7 @@ struct location {
 #define INVALID_LONGITUDE -1000
 #define INVALID_SPEED -1
 void GPS_init();
+void GPS_cleanup();
 struct location GPS_getLocation();
 
 #endif

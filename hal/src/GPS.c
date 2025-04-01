@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <stdbool.h>
 #include "hal/GPS.h"
 #include "sleep_and_timer.h"
 
@@ -13,14 +14,14 @@ int serial_port;
 static pthread_t gps_thread;
 static pthread_mutex_t gps_mutex = PTHREAD_MUTEX_INITIALIZER;  // Mutex to protect current_location
 static struct location current_location = {-1000, -1000, -1};  // Default invalid location
-
+static bool isRunning = false;
 static char* GPS_read();
 static struct location parse_GPRMC(char* gprmc_sentence);
 
 // Function that runs in the thread to continuously read GPS data
 static void* gps_thread_func(void* arg) {
     (void)arg;
-    while (1) {
+    while (isRunning) {
         // Get the latest GPS data
         char* gps_data = GPS_read();
         // Parse the data into the location structure
@@ -40,6 +41,7 @@ static void* gps_thread_func(void* arg) {
 }
 
 void GPS_init() {
+    isRunning = true;
     serial_port = open("/dev/ttyAMA0", O_RDWR);
     if (serial_port < 0) {
         printf("Error %i from open: %s\n", errno, strerror(errno));
@@ -175,4 +177,10 @@ static struct location parse_GPRMC(char* gnrmc_sentence) {
     }
     
     return data;
+}
+
+void GPS_cleanup() {
+    isRunning = false;  // Stop the GPS thread
+    pthread_join(gps_thread, NULL);  // Wait for the thread to finish
+    close(serial_port);  // Close the serial port
 }
