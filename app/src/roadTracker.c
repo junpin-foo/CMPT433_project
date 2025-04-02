@@ -83,45 +83,47 @@ static void* trackLocationThreadFunc(void* arg) {
                         target_set = false;
                         progress = 100;
                     }
-                } else {
-                    printf("Distance to target: %.2f km\n", current_distance);
                 }
             }
         }
+        sleepForMs(200);
+        // For testing
+        // target_set = true;
         // progress = 0;
+        // sleepForMs(3000);
+        // progress = 25;
+        // sleepForMs(3000);
+        // progress = 50;
+        // sleepForMs(3000);
+        // progress = 75;
         // sleepForMs(3000);
         // progress = 100;
         // sleepForMs(10000);
+        // target_set = false;
         // progress = 0;
         // sleepForMs(3000);
     }
-    sleepForMs(200);
     return NULL;
 }
 // Expecting to be call from microphone
 // Function to set the target location
 bool RoadTracker_setTarget(char *address) {
     assert(isInitialized);
-    if (!GPS_hasSignal()) {
-        printf("Need GPS signal before setting target again !\n");
+    target_address[sizeof(target_address) - 1] = '\0'; // Ensure null termination
+    target_location = StreetAPI_get_lat_long(address);
+    if (target_location.latitude == INVALID_LATITUDE) {
+        printf("Fail to set the Target Location due to invalid address. Check the address again !\n");
+        return false;
+    }
+    souruce_location  = GPS_getLocation();
+    if (souruce_location.latitude == INVALID_LATITUDE) {
+        printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again !\n");
         return false;
     } else {
-        struct location temp_source_location  = GPS_getLocation();
-        if (temp_source_location.latitude == INVALID_LATITUDE) {
-            printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again !\n");
-            return false;
-        } else {
-            strncpy(target_address, address, sizeof(target_address) - 1);
-            target_address[sizeof(target_address) - 1] = '\0'; // Ensure null termination
-            target_location = StreetAPI_get_lat_long(address);
-            souruce_location.latitude = temp_source_location.latitude;
-            souruce_location.longitude = temp_source_location.longitude;
-            souruce_location.speed = temp_source_location.speed;
-            totalDistanceNeeded = haversine_distance(souruce_location, target_location);
-            target_set = true;
-            printf("Target set to: Latitude %.6f, Longitude %.6f | Source Location: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, souruce_location.latitude, souruce_location.longitude, totalDistanceNeeded);
-            return true;
-        }
+        totalDistanceNeeded = haversine_distance(souruce_location, target_location);
+        target_set = true;
+        printf("Target set to: Latitude %.6f, Longitude %.6f | Source Location: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, souruce_location.latitude, souruce_location.longitude, totalDistanceNeeded);
+        return true;
     }
 }
 

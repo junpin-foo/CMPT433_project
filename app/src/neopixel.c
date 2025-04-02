@@ -92,10 +92,12 @@ void* LED_thread(void* arg)
         }
         if (!Parking_Activate()) {
             // printf("Parking not activated\n");
+            MEM_UINT32((uint8_t*)pR5Base + MODE_OFFSET) = 0;
             // From 1 to 8 in neopixel
             int led_on = RoadTracker_getProgress()/PROGRESS_PER_LED;
             int color = SpeedLED_getLEDColor();
             // int progress = 7;
+            // printf("led_on: %d\n", led_on);
             // printf("    %15s: 0x%04x\n", "progress", MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET));
             MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET) = led_on;
             MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = color;
