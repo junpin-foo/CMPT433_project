@@ -45,14 +45,11 @@ int main() {
     StreetAPI_cleanup();
     SpeedLED_cleanup();
     GPS_cleanup();
+    Joystick_cleanUp();
+    Parking_cleanup();
+    Gpio_cleanup();
     Accelerometer_cleanUp();
     Ic2_cleanUp();
-    printf("Exiting joystick\n");
-    Joystick_cleanUp();
-    printf("Exiting gpio\n");
-    Gpio_cleanup();
-    printf("Exiting parking\n");
-    Parking_cleanup();
     return 0;
 }
 

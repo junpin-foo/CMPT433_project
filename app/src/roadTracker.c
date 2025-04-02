@@ -66,31 +66,31 @@ static void* trackLocationThreadFunc(void* arg) {
     assert(isInitialized);
     (void)arg; // Suppress unused parameter warning
     while (isRunning) {
-        // if (target_set) {
-        //     current_location  = GPS_getLocation();
-        //     if (current_location.latitude == INVALID_LATITUDE) {
-        //         progress = 0;
-        //         printf("Unable to get GPS data, GPS no Signal !\n");
-        //     } else {
-        //         printf("Current Location: Latitude %.6f, Longitude: %.6f, Speed: %.6f \n", current_location.latitude, current_location.longitude, current_location.speed);
-        //         current_distance = haversine_distance(current_location, target_location);
-        //         if (totalDistanceNeeded > 0) {
-        //             progress = ((totalDistanceNeeded - current_distance) / totalDistanceNeeded) * 100;
-        //             if (progress < 0) {
-        //                 progress = 0;
-        //             } else if (current_distance <= 0.2) { // If within 200 meters of target
-        //                 target_set = false;
-        //                 progress = 100;
-        //             }
-        //         } else {
-        //             printf("Distance to target: %.2f km\n", current_distance);
-        //         }
-        //     }
-        // }
-        progress = 0;
-        sleepForMs(3000);
-        progress = 100;
-        sleepForMs(10000);
+        if (target_set) {
+            current_location  = GPS_getLocation();
+            if (current_location.latitude == INVALID_LATITUDE) {
+                progress = 0;
+                printf("Unable to get GPS data, GPS no Signal !\n");
+            } else {
+                printf("Current Location: Latitude %.6f, Longitude: %.6f, Speed: %.6f \n", current_location.latitude, current_location.longitude, current_location.speed);
+                current_distance = haversine_distance(current_location, target_location);
+                if (totalDistanceNeeded > 0) {
+                    progress = ((totalDistanceNeeded - current_distance) / totalDistanceNeeded) * 100;
+                    if (progress < 0) {
+                        progress = 0;
+                    } else if (current_distance <= 0.2) { // If within 200 meters of target
+                        target_set = false;
+                        progress = 100;
+                    }
+                } else {
+                    printf("Distance to target: %.2f km\n", current_distance);
+                }
+            }
+        }
+        // progress = 0;
+        // sleepForMs(3000);
+        // progress = 100;
+        // sleepForMs(10000);
         // progress = 0;
         // sleepForMs(3000);
     }

@@ -107,7 +107,7 @@ void configure_serial(int serial_port) {
 static char* GPS_read() {
     static char read_buf[255];
     configure_serial(serial_port);
-    while (1) {  // Keep reading until we find a $GNGGA message
+    while (isRunning) {  // Keep reading until we find a $GNGGA message
         int n = read(serial_port, &read_buf, sizeof(read_buf)); // Leave space for null terminator
         if (n > 0) {
             read_buf[n] = '\0'; // Properly terminate the string
@@ -119,6 +119,7 @@ static char* GPS_read() {
         }
         sleepForMs(100);
     }
+    return "";
 }
 
 static struct location parse_GPRMC(char* gnrmc_sentence) {
@@ -181,6 +182,7 @@ static struct location parse_GPRMC(char* gnrmc_sentence) {
 
 void GPS_cleanup() {
     isRunning = false;  // Stop the GPS thread
-    pthread_join(gps_thread, NULL);  // Wait for the thread to finish
+    pthread_cancel(gps_thread);  // Wait for the thread to finish
     close(serial_port);  // Close the serial port
+    printf("GPS cleanup\n");
 }

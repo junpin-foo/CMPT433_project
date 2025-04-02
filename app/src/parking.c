@@ -81,7 +81,7 @@ static void* parkingThreadFunc(void* arg) {
             sleepForMs(100);
             continue;
         }
-        printf("Parking activated\n");
+        // printf("Parking activated\n");
         isParking = true;
         AccelerometerData data = Accelerometer_getReading();
         if (mode == 2) { // Flat surface detection mode
