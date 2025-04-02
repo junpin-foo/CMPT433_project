@@ -74,7 +74,7 @@ static void* parkingThreadFunc(void* arg) {
     assert(isInitialized);
     (void)arg; // Suppress unused parameter warning
     while (isRunning) {
-        while (!RoadTracker_isProgressDone()) { //road tracker not running
+        while (!RoadTracker_isProgressDone() && isRunning) { //road tracker not running
             isParking = false;
             firstime = true;
             mode = 0;
