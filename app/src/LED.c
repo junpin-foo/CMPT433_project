@@ -14,7 +14,7 @@
 #include <pthread.h>
 #include <roadTracker.h>
 #include <speedLimitLED.h>
-
+#include <parking.h>
 #include "sharedDataLayout.h"
 
 // Memory mapping constants
@@ -70,13 +70,19 @@ void* LED_thread(void* arg)
     // int progress = 0;
     while (isRunning) {
         // progress = (progress + 1)%9;
-        int progress = RoadTracker_getProgress();
-        int color = SpeedLED_getLEDColor();
-        // int progress = 7;
-        // printf("    %15s: 0x%04x\n", "progress", MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET));
-        MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET) = progress;
-        printf("color: %d\n", color);
-        MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = color;
+        if (!Parking_Activate()) {
+            printf("Parking not activated\n");
+            int progress = RoadTracker_getProgress();
+            int color = SpeedLED_getLEDColor();
+            // int progress = 7;
+            // printf("    %15s: 0x%04x\n", "progress", MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET));
+            MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET) = progress;
+            printf("color: %d\n", color);
+            MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = color;
+        } else {
+            MEM_UINT32((uint8_t*)pR5Base + MODE_OFFSET) = Parking_getMode();
+            MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = Parking_getColor();
+        }
         sleepForMs(1000);
     }
     MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = 4;

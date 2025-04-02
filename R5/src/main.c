@@ -68,6 +68,23 @@ static void initialize_gpio(const struct gpio_dt_spec *pPin, int direction)
 	}
 }
 
+static void setColor(uint32_t color) 
+{
+	for(int i = 31; i >= 0; i--) {
+		if((color & ((uint32_t)0x1 << i ))) {
+			gpio_pin_set_dt(&neopixel, 1);
+			NEO_DELAY_ONE_ON();
+			gpio_pin_set_dt(&neopixel, 0);
+			NEO_DELAY_ONE_OFF();
+		} else {
+			gpio_pin_set_dt(&neopixel, 1);
+			NEO_DELAY_ZERO_ON();
+			gpio_pin_set_dt(&neopixel, 0);
+			NEO_DELAY_ZERO_OFF();
+		}
+	}
+}
+
 int main(void)
 {
 	printf("Hello World! %s\n", CONFIG_BOARD_TARGET);
@@ -129,6 +146,7 @@ int main(void)
 		DELAY_NS(NEO_RESET_NS);
 		int progress_raw = MEM_UINT32(pR5Base + PROGRESS_OFFSET) - 1;
 		int colorCode = MEM_UINT32(pR5Base + COLOR_OFFSET);
+		int modeCode = MEM_UINT32(pR5Base + MODE_OFFSET);
 
 		// Changing Color
 		uint32_t currentColor =0x0000000f;
@@ -140,54 +158,45 @@ int main(void)
 			currentColor =0x0f000000; //GREEN
 		} else if (colorCode == 3) {
 			for(int j = 0; j < NEO_NUM_LEDS; j++) {
-				for(int i = 31; i >= 0; i--) {
-					if((0x000f0f00 & (uint32_t)0x1 << i)) {
-						gpio_pin_set_dt(&neopixel, 1);
-						NEO_DELAY_ONE_ON();
-						gpio_pin_set_dt(&neopixel, 0);
-						NEO_DELAY_ONE_OFF();
-					} else {
-						gpio_pin_set_dt(&neopixel, 1);
-						NEO_DELAY_ZERO_ON();
-						gpio_pin_set_dt(&neopixel, 0);
-						NEO_DELAY_ZERO_OFF();
+				setColor(0x000f0f00); //purple when no gps signal
+			}
+			continue;
+		}
+
+		if(modeCode == 1) { //hand break check
+			int delay_time = 25;
+			for(int k = 0;  k < NEO_NUM_LEDS; k++) {
+				for(int j = (NEO_NUM_LEDS - 1); j >= 0; j--) {
+					if (j == k) { //on
+						setColor(0x0f000f00); //teal
 					}
+					else { //off
+						setColor(0x00000000);
+					}
+				}
+				k_busy_wait(delay_time * 10000);
+			}
+			continue;
+
+		}
+		else if (modeCode == 2) { //flat surface detection
+			for(int j = 0; j < NEO_NUM_LEDS; j++) {
+				setColor(currentColor);// color depends on slope
+			}
+			continue;
+		}
+		else {
+			for(int j = 0; j < NEO_NUM_LEDS; j++) {
+				if (j <= progress_raw) {
+					setColor(currentColor);
+				} else {
+					setColor(0x0f0f0f00); //tracker progress
 				}
 			}
 			continue;
 		}
 
-		for(int j = 0; j < NEO_NUM_LEDS; j++) {
-			if (j <= progress_raw) {
-				for(int i = 31; i >= 0; i--) {
-					if((currentColor & (uint32_t)0x1 << i)) {
-						gpio_pin_set_dt(&neopixel, 1);
-						NEO_DELAY_ONE_ON();
-						gpio_pin_set_dt(&neopixel, 0);
-						NEO_DELAY_ONE_OFF();
-					} else {
-						gpio_pin_set_dt(&neopixel, 1);
-						NEO_DELAY_ZERO_ON();
-						gpio_pin_set_dt(&neopixel, 0);
-						NEO_DELAY_ZERO_OFF();
-					}
-				}
-			} else {
-				for(int i = 31; i >= 0; i--) {
-					if((0x0f0f0f00 & (uint32_t)0x1 << i)) {
-						gpio_pin_set_dt(&neopixel, 1);
-						NEO_DELAY_ONE_ON();
-						gpio_pin_set_dt(&neopixel, 0);
-						NEO_DELAY_ONE_OFF();
-					} else {
-						gpio_pin_set_dt(&neopixel, 1);
-						NEO_DELAY_ZERO_ON();
-						gpio_pin_set_dt(&neopixel, 0);
-						NEO_DELAY_ZERO_OFF();
-					}
-				}
-			}
-		}
+		
 		gpio_pin_set_dt(&neopixel, 0);
 		NEO_DELAY_RESET();
 		// Keep looping in case we plug in NeoPixel later

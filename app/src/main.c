@@ -14,11 +14,11 @@
 #include "hal/microphone.h"
 #include "hal/rotary_state.h"
 #include "LED.h"
+#include "parking.h"
 
 
 int main() {
     Ic2_initialize();
-    // Initialize accelerometer and GPS
     Gpio_initialize();
     Joystick_initialize();
     Accelerometer_initialize();
@@ -29,7 +29,7 @@ int main() {
     // RoadTracker_setTarget("13450 102 Ave #250, Surrey, BC V3T 0A3");
     LED_init();
     UpdateLcd_init();
-
+    Parking_init();
     while (true) {
         if (Joystick_isButtonPressed()) {
             // Handle joystick button press
@@ -47,8 +47,12 @@ int main() {
     GPS_cleanup();
     Accelerometer_cleanUp();
     Ic2_cleanUp();
+    printf("Exiting joystick\n");
     Joystick_cleanUp();
+    printf("Exiting gpio\n");
     Gpio_cleanup();
+    printf("Exiting parking\n");
+    Parking_cleanup();
     return 0;
 }
 

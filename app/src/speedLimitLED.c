@@ -10,6 +10,7 @@
 #include "sleep_and_timer.h"
 #include <assert.h>
 #include <math.h>
+#include "parking.h"
 
 static pthread_t updateLEDThread;
 static pthread_t updateSpeedLimitThread;
@@ -42,7 +43,7 @@ static void* updateSpeedAndLEDThreadFunc(void* arg) {
         } else if (gps_speed_kmh > speedLimit) {
             led_color = 0;//red
         } else {
-           led_color = 2;//green
+            led_color = 2;//green
         }
         
         // printf("Current Speed: (gps) %.2f km/h\n", gps_speed_kmh);
