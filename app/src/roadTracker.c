@@ -95,6 +95,7 @@ static void* trackLocationThreadFunc(void* arg) {
         // progress = 0;
         // sleepForMs(3000);
     }
+    sleepForMs(200);
     return NULL;
 }
 // Expecting to be call from microphone
@@ -105,7 +106,7 @@ bool RoadTracker_setTarget(char *address) {
         printf("Need GPS signal before setting target again !\n");
         return false;
     } else {
-            struct location temp_source_location  = GPS_getLocation();
+        struct location temp_source_location  = GPS_getLocation();
         if (temp_source_location.latitude == INVALID_LATITUDE) {
             printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again !\n");
             return false;

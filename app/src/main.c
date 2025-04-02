@@ -27,14 +27,14 @@ int main() {
     SpeedLED_init();
     StreetAPI_init();
     RoadTracker_init();
-    // RoadTracker_setTarget("8888 University Dr W, Burnaby, BC V5A 1S6");
     UpdateLcd_init();
     Parking_init();
     NeoPixel_init();
     while (true) {
         if (Joystick_isButtonPressed()) {
+            RoadTracker_setTarget("8888 University Dr W, Burnaby, BC V5A 1S6");
             // Handle joystick button press
-            break;
+            // break;
         } 
         sleepForMs(100);
     }
