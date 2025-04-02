@@ -24,6 +24,6 @@ char* RoadTracker_getTargetAddress();
 // Function to get progress percentage
 double RoadTracker_getProgress();
 
-bool RoadTracker_isProgressDone(void);
+bool RoadTracker_isRunning();
 
 #endif // ROADTRACKER_H

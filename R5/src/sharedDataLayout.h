@@ -14,6 +14,8 @@
 #define PROGRESS_OFFSET (MSG_OFFSET + sizeof(uint32_t))
 #define COLOR_OFFSET (PROGRESS_OFFSET + sizeof(uint32_t))
 #define MODE_OFFSET (COLOR_OFFSET + sizeof(uint32_t))
+#define GPS_SIGNAL_OFFSET (MODE_OFFSET + sizeof(uint32_t))
+
 
 #define MEM_UINT8(addr) *(uint8_t*)(addr)
 #define MEM_UINT32(addr) *(uint32_t*)(addr)

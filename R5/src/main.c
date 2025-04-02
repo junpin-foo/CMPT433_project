@@ -85,6 +85,7 @@ static void setColor(uint32_t color)
 	}
 }
 
+
 int main(void)
 {
 	printf("Hello World! %s\n", CONFIG_BOARD_TARGET);
@@ -147,6 +148,8 @@ int main(void)
 		int progress_raw = MEM_UINT32(pR5Base + PROGRESS_OFFSET) - 1;
 		int colorCode = MEM_UINT32(pR5Base + COLOR_OFFSET);
 		int modeCode = MEM_UINT32(pR5Base + MODE_OFFSET);
+		
+		int gpsSignal = MEM_UINT32(pR5Base + GPS_SIGNAL_OFFSET);
 
 		// Changing Color
 		uint32_t currentColor =0x0000000f;
@@ -156,12 +159,7 @@ int main(void)
 			currentColor =0x0f0f0000; //YELLOW
 		} else if (colorCode == 2) {
 			currentColor =0x0f000000; //GREEN
-		} else if (colorCode == 3) {
-			for(int j = 0; j < NEO_NUM_LEDS; j++) {
-				setColor(0x000f0f00); //purple when no gps signal
-			}
-			continue;
-		}
+		} 
 
 		if(modeCode == 1) { //hand break check
 			int delay_time = 25;

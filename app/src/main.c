@@ -13,8 +13,9 @@
 #include "hal/joystick.h"
 #include "hal/microphone.h"
 #include "hal/rotary_state.h"
-#include "LED.h"
+#include "neopixel.h"
 #include "parking.h"
+#include "hal/led.h"
 
 
 int main() {
@@ -26,10 +27,10 @@ int main() {
     SpeedLED_init();
     StreetAPI_init();
     RoadTracker_init();
-    // RoadTracker_setTarget("13450 102 Ave #250, Surrey, BC V3T 0A3");
-    LED_init();
+    // RoadTracker_setTarget("8888 University Dr W, Burnaby, BC V5A 1S6");
     UpdateLcd_init();
     Parking_init();
+    NeoPixel_init();
     while (true) {
         if (Joystick_isButtonPressed()) {
             // Handle joystick button press
@@ -39,11 +40,12 @@ int main() {
     }
 
     // Cleanup resources
+    NeoPixel_cleanUp();
     UpdateLcd_cleanup();
-    LED_cleanup();
     RoadTracker_cleanup();
     StreetAPI_cleanup();
     SpeedLED_cleanup();
+    Led_cleanUp();
     GPS_cleanup();
     Joystick_cleanUp();
     Parking_cleanup();

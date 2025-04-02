@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include "hal/GPS.h"
+#include "stdbool.h"
 #include "sleep_and_timer.h"
 
 int serial_port;
@@ -15,6 +16,7 @@ static pthread_t gps_thread;
 static pthread_mutex_t gps_mutex = PTHREAD_MUTEX_INITIALIZER;  // Mutex to protect current_location
 static struct location current_location = {-1000, -1000, -1};  // Default invalid location
 static bool isRunning = false;
+static bool signal = false;
 static char* GPS_read();
 static struct location parse_GPRMC(char* gprmc_sentence);
 
@@ -31,7 +33,10 @@ static void* gps_thread_func(void* arg) {
         pthread_mutex_lock(&gps_mutex);   // Lock the mutex before updating
         current_location = new_location;
         if (current_location.latitude == INVALID_LATITUDE) {
+            signal = false;
             printf("NO GPS Signal !\n");
+        } else {
+            signal = true;
         }
         pthread_mutex_unlock(&gps_mutex); // Unlock the mutex after updating
         
@@ -185,4 +190,8 @@ void GPS_cleanup() {
     pthread_cancel(gps_thread);  // Wait for the thread to finish
     close(serial_port);  // Close the serial port
     printf("GPS cleanup\n");
+}
+
+bool GPS_hasSignal() {
+    return signal;
 }

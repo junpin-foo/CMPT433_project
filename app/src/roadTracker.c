@@ -72,6 +72,7 @@ static void* trackLocationThreadFunc(void* arg) {
                 progress = 0;
                 printf("Unable to get GPS data, GPS no Signal !\n");
             } else {
+                current_location  = GPS_getLocation();
                 printf("Current Location: Latitude %.6f, Longitude: %.6f, Speed: %.6f \n", current_location.latitude, current_location.longitude, current_location.speed);
                 current_distance = haversine_distance(current_location, target_location);
                 if (totalDistanceNeeded > 0) {
@@ -100,21 +101,26 @@ static void* trackLocationThreadFunc(void* arg) {
 // Function to set the target location
 bool RoadTracker_setTarget(char *address) {
     assert(isInitialized);
-    struct location temp_source_location  = GPS_getLocation();
-    if (temp_source_location.latitude == INVALID_LATITUDE) {
-        printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again !\n");
+    if (!GPS_hasSignal()) {
+        printf("Need GPS signal before setting target again !\n");
         return false;
     } else {
-        strncpy(target_address, address, sizeof(target_address) - 1);
-        target_address[sizeof(target_address) - 1] = '\0'; // Ensure null termination
-        target_location = StreetAPI_get_lat_long(address);
-        souruce_location.latitude = temp_source_location.latitude;
-        souruce_location.longitude = temp_source_location.longitude;
-        souruce_location.speed = temp_source_location.speed;
-        totalDistanceNeeded = haversine_distance(souruce_location, target_location);
-        target_set = true;
-        printf("Target set to: Latitude %.6f, Longitude %.6f | Source Location: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, souruce_location.latitude, souruce_location.longitude, totalDistanceNeeded);
-        return true;
+            struct location temp_source_location  = GPS_getLocation();
+        if (temp_source_location.latitude == INVALID_LATITUDE) {
+            printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again !\n");
+            return false;
+        } else {
+            strncpy(target_address, address, sizeof(target_address) - 1);
+            target_address[sizeof(target_address) - 1] = '\0'; // Ensure null termination
+            target_location = StreetAPI_get_lat_long(address);
+            souruce_location.latitude = temp_source_location.latitude;
+            souruce_location.longitude = temp_source_location.longitude;
+            souruce_location.speed = temp_source_location.speed;
+            totalDistanceNeeded = haversine_distance(souruce_location, target_location);
+            target_set = true;
+            printf("Target set to: Latitude %.6f, Longitude %.6f | Source Location: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, souruce_location.latitude, souruce_location.longitude, totalDistanceNeeded);
+            return true;
+        }
     }
 }
 
@@ -143,6 +149,6 @@ double RoadTracker_getProgress(void) {
 }
 
 // Function to get progress done
-bool RoadTracker_isProgressDone(void) {
-    return (progress == 100);
+bool RoadTracker_isRunning(void) {
+    return target_set;
 }

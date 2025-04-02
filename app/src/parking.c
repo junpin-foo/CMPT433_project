@@ -54,7 +54,7 @@ static void* modeThreadFunc(void* args) {
 
         struct location current_location = GPS_getLocation();
         double gps_speed_kmh = current_location.speed;
-        if(gps_speed_kmh < 2 && firstime  && RoadTracker_isProgressDone()) {
+        if(gps_speed_kmh < 2 && firstime  && !RoadTracker_isRunning()) {
             firstime = false;
             mode = 1; //default start handbreak reminder
         }
@@ -74,7 +74,7 @@ static void* parkingThreadFunc(void* arg) {
     assert(isInitialized);
     (void)arg; // Suppress unused parameter warning
     while (isRunning) {
-        while (!RoadTracker_isProgressDone() && isRunning) { //road tracker not running
+        while (RoadTracker_isRunning() && isRunning) { //road tracker is running
             isParking = false;
             firstime = true;
             mode = 0;

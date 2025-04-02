@@ -1,6 +1,8 @@
 #ifndef _GPS_H
 #define _GPS_H
 
+#include <stdbool.h>
+
 struct location {
     double latitude;
     double longitude;
@@ -12,6 +14,7 @@ struct location {
 #define INVALID_SPEED -1
 void GPS_init();
 void GPS_cleanup();
+bool GPS_hasSignal();
 struct location GPS_getLocation();
 
 #endif

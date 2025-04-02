@@ -16,17 +16,23 @@
 #include <speedLimitLED.h>
 #include <parking.h>
 #include "sharedDataLayout.h"
+#include "neopixel.h"
+#include "hal/led.h"
+#include "hal/GPS.h"
 
 // Memory mapping constants
 #define ATCM_ADDR     0x79000000  // MCU ATCM (p59 TRM)
 #define BTCM_ADDR     0x79020000  // MCU BTCM (p59 TRM)
 #define MEM_LENGTH    0x8000
 
+#define GREEN_LED &leds[0]
+#define RED_LED &leds[1]
+
 static bool isInitialized = false;
 static pthread_t LEDpthread;
 static bool isRunning = false;
 
-void* LED_thread(void* arg);
+static void* LED_thread(void* arg);
 
 // Memory mapping function
 volatile void* getR5MmapAddr(void)
@@ -51,11 +57,12 @@ volatile void* getR5MmapAddr(void)
 }
 
 
-void LED_init(void)
+void NeoPixel_init(void)
 {
     assert(!isInitialized);
     isInitialized = true;
     isRunning = true;
+    Led_initialize();
     if (pthread_create(&LEDpthread, NULL, LED_thread, NULL) != 0) {
         perror("Failed to create accelerometer thread");
         exit(EXIT_FAILURE);
@@ -70,6 +77,17 @@ void* LED_thread(void* arg)
     // int progress = 0;
     while (isRunning) {
         // progress = (progress + 1)%9;
+        if (GPS_hasSignal()) {
+            Led_setTrigger(RED_LED, "none");
+            Led_setBrightness(RED_LED, 0);
+            Led_setTrigger(GREEN_LED, "none");
+            Led_setBrightness(GREEN_LED, 1);
+        } else {
+            Led_setTrigger(GREEN_LED, "none");
+            Led_setBrightness(GREEN_LED, 0);
+            Led_setTrigger(RED_LED, "none");
+            Led_setBrightness(RED_LED, 1);
+        }
         if (!Parking_Activate()) {
             printf("Parking not activated\n");
             int progress = RoadTracker_getProgress();
@@ -89,10 +107,11 @@ void* LED_thread(void* arg)
     return NULL;
 }
 
-void LED_cleanup()
+void NeoPixel_cleanUp()
 {
     assert(isInitialized);
     isRunning = false;
+    Led_cleanUp();
     pthread_join(LEDpthread, NULL);
     isInitialized = false;
 }
