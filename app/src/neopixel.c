@@ -27,6 +27,8 @@
 
 #define GREEN_LED &leds[0]
 #define RED_LED &leds[1]
+#define PROGRESS_PER_LED 12.5
+#define MAX_NUM_LED 8
 
 static bool isInitialized = false;
 static pthread_t LEDpthread;
@@ -89,13 +91,13 @@ void* LED_thread(void* arg)
             Led_setBrightness(RED_LED, 1);
         }
         if (!Parking_Activate()) {
-            printf("Parking not activated\n");
-            int progress = RoadTracker_getProgress();
+            // printf("Parking not activated\n");
+            // From 1 to 8 in neopixel
+            int led_on = RoadTracker_getProgress()/PROGRESS_PER_LED;
             int color = SpeedLED_getLEDColor();
             // int progress = 7;
             // printf("    %15s: 0x%04x\n", "progress", MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET));
-            MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET) = progress;
-            printf("color: %d\n", color);
+            MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET) = led_on;
             MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = color;
         } else {
             MEM_UINT32((uint8_t*)pR5Base + MODE_OFFSET) = Parking_getMode();
