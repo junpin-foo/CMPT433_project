@@ -18,11 +18,11 @@ static bool isInitialized = false;
 
 static struct location target_location = {INVALID_LATITUDE, INVALID_LONGITUDE, -1};
 static struct location souruce_location = {INVALID_LATITUDE, INVALID_LONGITUDE, -1};
-// static struct location current_location = {INVALID_LATITUDE, INVALID_LONGITUDE, -1};
+static struct location current_location = {INVALID_LATITUDE, INVALID_LONGITUDE, -1};
 static bool target_set = false;
 static void* trackLocationThreadFunc(void* arg);
 static double totalDistanceNeeded = -1;
-// static double current_distance = -1;
+static double current_distance = -1;
 static double progress = 0;
 static char target_address[256] = "";
 
