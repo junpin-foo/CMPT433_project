@@ -162,7 +162,7 @@ int main(void)
 		} 
 
 		if(modeCode == 1) { //hand break check
-			int delay_time = 25;
+			int delay_time = 15;
 			for(int k = 0;  k < NEO_NUM_LEDS; k++) {
 				for(int j = (NEO_NUM_LEDS - 1); j >= 0; j--) {
 					if (j == k) { //on
