@@ -24,6 +24,7 @@ int main() {
     Joystick_initialize();
     Accelerometer_initialize();
     GPS_init();
+    // GPS_demoInit();
     SpeedLED_init();
     StreetAPI_init();
     RoadTracker_init();
@@ -32,7 +33,7 @@ int main() {
     NeoPixel_init();
     while (true) {
         if (Joystick_isButtonPressed()) {
-            RoadTracker_setTarget("614 Decker Place Coquitlam, V3C 5W7");
+            RoadTracker_setTarget("Simon Fraser University");
             // Handle joystick button press
             // break;
         } 

@@ -88,6 +88,41 @@ void GPS_init() {
     pthread_create(&gps_thread, NULL, gps_thread_func, NULL);
 }
 
+
+static void* gps_thread2_func(void* arg) {
+    (void)arg;
+    while (isRunning) {
+        pthread_mutex_lock(&gps_mutex);   // Lock the mutex before updating
+        FILE* file = fopen("gps.txt", "r");
+        if (file == NULL) {
+            perror("Failed to open file");
+            return 0; // failure
+        }
+
+        if (fscanf(file, "%ld %ld %ld", &current_location.latitude, &current_location.longitude, &current_location.speed) != 3) {
+            fprintf(stderr, "Invalid file format. Expected 3 numbers.\n");
+            fclose(file);
+            return 0; // failure
+        }
+        printf("Thread %ld - Got: lat=%.2f, lon=%.2f, spd=%.2f\n", (long)arg, current_location.latitude, current_location.longitude, current_location.speed);
+        pthread_mutex_unlock(&gps_mutex); // Unlock the mutex after updating
+    }
+    return NULL;
+}
+
+void GPS_demoInit() {
+    signal = true;
+    pthread_create(&gps_thread, NULL, gps_thread2_func, NULL);
+}
+
+void GPS_setLocation(struct location loc) {
+    pthread_mutex_lock(&gps_mutex);   // Lock the mutex before updating
+    current_location.latitude = loc.latitude;
+    current_location.longitude = loc.longitude;
+    current_location.speed = loc.speed;
+    pthread_mutex_unlock(&gps_mutex); // Unlock the mutex after updating
+}
+
 struct location GPS_getLocation() {
     struct location loc;
     pthread_mutex_lock(&gps_mutex);   // Lock the mutex before reading

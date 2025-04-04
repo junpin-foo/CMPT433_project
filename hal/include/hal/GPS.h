@@ -14,6 +14,7 @@ struct location {
 #define INVALID_SPEED -1
 void GPS_init();
 void GPS_cleanup();
+void GPS_demoInit(); 
 bool GPS_hasSignal();
 struct location GPS_getLocation();
 
