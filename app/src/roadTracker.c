@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <math.h>
+#include <sys/wait.h>
 #include <assert.h>
 #include "hal/GPS.h"
 #include "streetAPI.h"
@@ -29,6 +31,15 @@ static char target_address[256] = "";
 // Convert degrees to radians
 static double deg_to_rad(double deg) {
     return deg * (M_PI / 180.0);
+}
+
+void runCommand(const char* command) {
+    if (system(command) == -1) {
+        printf("%s\n", command);
+        printf("error: system() command failed\n");
+    } else {
+        printf("%s\n", command);
+    }
 }
 
 // Haversine formula to calculate distance between two locations
@@ -107,20 +118,45 @@ static void* trackLocationThreadFunc(void* arg) {
 }
 // Expecting to be call from microphone
 // Function to set the target location
+// It will play the audio to let user know the target location is set or not
+static void resetLocationInfo() {
+    target_location.latitude = INVALID_LATITUDE;
+    target_location.longitude = INVALID_LONGITUDE;
+    souruce_location.latitude = INVALID_LATITUDE;
+    souruce_location.longitude = INVALID_LONGITUDE;
+    current_location.latitude = INVALID_LATITUDE;
+    current_location.longitude = INVALID_LONGITUDE;
+    totalDistanceNeeded = -1;
+    current_distance = -1;
+    progress = 0;
+}
+
 bool RoadTracker_setTarget(char *address) {
     assert(isInitialized);
-    target_address[sizeof(target_address) - 1] = '\0'; // Ensure null termination
     target_location = StreetAPI_get_lat_long(address);
+    printf("Target Location: Latitude %.6f, Longitude %.6f\n", target_location.latitude, target_location.longitude);
     if (target_location.latitude == INVALID_LATITUDE) {
-        printf("Fail to set the Target Location due to invalid address. Check the address again !\n");
+        strcpy(target_address, "");
+        runCommand("espeak 'Fail to set the Target Location due to invalid input address. Check the input address again ' -w invalidTargetError.wav");
+        runCommand("aplay -q invalidTargetError.wav");
+        // printf("Fail to set the Target Location due to invalid address. Check the address again !\n");
+        resetLocationInfo();
         return false;
     }
     souruce_location  = GPS_getLocation();
     if (souruce_location.latitude == INVALID_LATITUDE) {
-        printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again !\n");
+        strcpy(target_address, "");
+        runCommand("espeak 'Fail to set the Target Location due to invalid current location. Check the GPS signal again ' -w invalidCurrentError.wav");
+        runCommand("aplay -q invalidCurrentError.wav");
+        // printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again !\n");
+        resetLocationInfo();
         return false;
     } else {
+        strncpy(target_address, address, sizeof(target_address) - 1);
+        target_address[sizeof(target_address) - 1] = '\0'; // Ensure null termination
         totalDistanceNeeded = haversine_distance(souruce_location, target_location);
+        runCommand("espeak 'Successfully setting the target destination ' -w successSet.wav");
+        runCommand("aplay -q successSet.wav");
         target_set = true;
         printf("Target set to: Latitude %.6f, Longitude %.6f | Source Location: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, souruce_location.latitude, souruce_location.longitude, totalDistanceNeeded);
         return true;
