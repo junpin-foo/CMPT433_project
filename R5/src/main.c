@@ -174,6 +174,10 @@ int main(void)
 				}
 				k_busy_wait(delay_time * 10000);
 			}
+			gpio_pin_set_dt(&neopixel, 0);
+			NEO_DELAY_RESET();
+			// Keep looping in case we plug in NeoPixel later
+			k_busy_wait(10000);
 			continue;
 
 		}
@@ -181,6 +185,10 @@ int main(void)
 			for(int j = 0; j < NEO_NUM_LEDS; j++) {
 				setColor(currentColor);// color depends on slope
 			}
+			gpio_pin_set_dt(&neopixel, 0);
+			NEO_DELAY_RESET();
+			// Keep looping in case we plug in NeoPixel later
+			k_busy_wait(10000);
 			continue;
 		}
 		else {
@@ -191,10 +199,13 @@ int main(void)
 					setColor(0x0f0f0f00); //tracker progress
 				}
 			}
+			gpio_pin_set_dt(&neopixel, 0);
+			NEO_DELAY_RESET();
+			// Keep looping in case we plug in NeoPixel later
+			k_busy_wait(10000);
 			continue;
 		}
 
-		
 		gpio_pin_set_dt(&neopixel, 0);
 		NEO_DELAY_RESET();
 		// Keep looping in case we plug in NeoPixel later

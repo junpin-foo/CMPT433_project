@@ -80,18 +80,14 @@ void* LED_thread(void* arg)
     while (isRunning) {
         // progress = (progress + 1)%9;
         if (GPS_hasSignal()) {
-            Led_setTrigger(RED_LED, "none");
-            Led_setBrightness(RED_LED, 0);
             Led_setTrigger(GREEN_LED, "none");
             Led_setBrightness(GREEN_LED, 1);
         } else {
             Led_setTrigger(GREEN_LED, "none");
             Led_setBrightness(GREEN_LED, 0);
-            Led_setTrigger(RED_LED, "none");
-            Led_setBrightness(RED_LED, 1);
         }
         if (!Parking_Activate()) {
-            // printf("Parking not activated\n");
+            printf("Parking not activated\n");
             MEM_UINT32((uint8_t*)pR5Base + MODE_OFFSET) = 0;
             // From 1 to 8 in neopixel
             int led_on = RoadTracker_getProgress()/PROGRESS_PER_LED;
@@ -102,6 +98,9 @@ void* LED_thread(void* arg)
             MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET) = led_on;
             MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = color;
         } else {
+            printf("Parking activated\n");
+            printf("modenumber: %d\n", Parking_getMode());
+            printf("color: %d\n", Parking_getMode());
             MEM_UINT32((uint8_t*)pR5Base + MODE_OFFSET) = Parking_getMode();
             MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = Parking_getColor();
         }

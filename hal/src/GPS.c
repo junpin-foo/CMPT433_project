@@ -32,6 +32,7 @@ static void* gps_thread_func(void* arg) {
         // Update the global location safely using mutex
         pthread_mutex_lock(&gps_mutex);   // Lock the mutex before updating
         current_location = new_location;
+        printf("current_location: Latitude %.6f, Longitude: %.6f, Speed: %.6f \n", current_location.latitude, current_location.longitude, current_location.speed);
         if (current_location.latitude == INVALID_LATITUDE) {
             signal = false;
             printf("NO GPS Signal !\n");
@@ -116,7 +117,7 @@ static char* GPS_read() {
         int n = read(serial_port, &read_buf, sizeof(read_buf)); // Leave space for null terminator
         if (n > 0) {
             read_buf[n] = '\0'; // Properly terminate the string
-            
+            printf("here");
             // Check if the received message starts with "$GNRMC"
             if (strncmp(read_buf, "$GNRMC", 5) == 0) {
                 return read_buf;

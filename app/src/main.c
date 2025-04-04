@@ -27,12 +27,12 @@ int main() {
     SpeedLED_init();
     StreetAPI_init();
     RoadTracker_init();
-    UpdateLcd_init();
+    // UpdateLcd_init();
     Parking_init();
     NeoPixel_init();
     while (true) {
         if (Joystick_isButtonPressed()) {
-            RoadTracker_setTarget("8888 University Dr W, Burnaby, BC V5A 1S6");
+            RoadTracker_setTarget("614 Decker Place Coquitlam, V3C 5W7");
             // Handle joystick button press
             // break;
         } 
@@ -41,7 +41,7 @@ int main() {
 
     // Cleanup resources
     NeoPixel_cleanUp();
-    UpdateLcd_cleanup();
+    // UpdateLcd_cleanup();
     RoadTracker_cleanup();
     StreetAPI_cleanup();
     SpeedLED_cleanup();

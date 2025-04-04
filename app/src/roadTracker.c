@@ -88,11 +88,13 @@ static void* trackLocationThreadFunc(void* arg) {
                 current_distance = haversine_distance(current_location, target_location);
                 if (totalDistanceNeeded > 0) {
                     progress = ((totalDistanceNeeded - current_distance) / totalDistanceNeeded) * 100;
+                    printf("Progress: %.2f%%\n", progress);
                     if (progress < 0) {
                         progress = 0;
                     } else if (current_distance <= 0.2) { // If within 200 meters of target
-                        target_set = false;
                         progress = 100;
+                        sleepForMs(2000);
+                        target_set = false;
                     }
                 }
             }
