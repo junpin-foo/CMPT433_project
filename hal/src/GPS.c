@@ -99,7 +99,7 @@ static void* gps_thread2_func(void* arg) {
             return 0; // failure
         }
 
-        if (fscanf(file, "%ld %ld %ld", &current_location.latitude, &current_location.longitude, &current_location.speed) != 3) {
+        if (fscanf(file, "%lf %lf %lf", &current_location.latitude, &current_location.longitude, &current_location.speed) != 3) {
             fprintf(stderr, "Invalid file format. Expected 3 numbers.\n");
             fclose(file);
             return 0; // failure
