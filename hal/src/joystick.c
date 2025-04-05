@@ -88,10 +88,10 @@ void *joystick_button_thread_func(void *arg) {
         clock_gettime(CLOCK_MONOTONIC, &now);
 
         if (buttonFlag && time_diff_ms(&last_btn_time, &now) > DEBOUNCE_TIME_MS) {
-            int new_page = atomic_load(&page_number) % 2 + 1;
+            // int new_page = atomic_load(&page_number) % 2 + 1;
             atomic_store(&isButtonPressed, 1);
-            atomic_store(&page_number, new_page);
-            printf("Button pressed");
+            // atomic_store(&page_number, new_page);
+            // printf("Button pressed");
             last_btn_time = now;
         } else {
             atomic_store(&isButtonPressed, 0);

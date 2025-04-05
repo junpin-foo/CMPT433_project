@@ -10,51 +10,32 @@
 #include "streetAPI.h"
 #include "sleep_and_timer.h"
 #include "roadTracker.h"
+#include <stdatomic.h>
 
 #define EARTH_RADIUS 6371.0 // Radius of Earth in kilometers
 #define M_PI 3.14159265358979323846
+#define THRESHOLD_REACH 0.3
+#define SLEEP_TIME_FOR_PROGRESS_FULL 3000
 
 static pthread_t roadTrackerThread;
 static bool isRunning = false;
 static bool isInitialized = false;
+static pthread_mutex_t roadTrackerMutex = PTHREAD_MUTEX_INITIALIZER; // Mutex to protect road tracker data
 
 static struct location target_location = {INVALID_LATITUDE, INVALID_LONGITUDE, -1};
 static struct location souruce_location = {INVALID_LATITUDE, INVALID_LONGITUDE, -1};
 static struct location current_location = {INVALID_LATITUDE, INVALID_LONGITUDE, -1};
 static bool target_set = false;
-static void* trackLocationThreadFunc(void* arg);
 static double totalDistanceNeeded = -1;
 static double current_distance = -1;
 static double progress = 0;
 static char target_address[256] = "";
 
-// Convert degrees to radians
-static double deg_to_rad(double deg) {
-    return deg * (M_PI / 180.0);
-}
-
-void runCommand(const char* command) {
-    if (system(command) == -1) {
-        printf("%s\n", command);
-        printf("error: system() command failed\n");
-    } else {
-        printf("%s\n", command);
-    }
-}
-
-// Haversine formula to calculate distance between two locations
-static double haversine_distance(struct location loc1, struct location loc2) {
-    double dlat = deg_to_rad(loc2.latitude - loc1.latitude);
-    double dlon = deg_to_rad(loc2.longitude - loc1.longitude);
-
-    double a = sin(dlat / 2) * sin(dlat / 2) +
-               cos(deg_to_rad(loc1.latitude)) * cos(deg_to_rad(loc2.latitude)) *
-               sin(dlon / 2) * sin(dlon / 2);
-
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-
-    return EARTH_RADIUS * c; // Distance in kilometers
-}
+static void* trackLocationThreadFunc(void* arg);
+static void runCommand(const char* command);
+static void RoadTracker_resetData();
+static double deg_to_rad(double deg);
+static double haversine_distance(struct location loc1, struct location loc2);
 
 // Initialization function
 void RoadTracker_init(void) {
@@ -81,47 +62,77 @@ static void* trackLocationThreadFunc(void* arg) {
             current_location  = GPS_getLocation();
             if (current_location.latitude == INVALID_LATITUDE) {
                 progress = 0;
-                printf("Unable to get GPS data, GPS no Signal !\n");
+                printf("Invalid Current Location. Check GPS signal !\n");
             } else {
                 current_location  = GPS_getLocation();
-                printf("Current Location: Latitude %.6f, Longitude: %.6f, Speed: %.6f \n", current_location.latitude, current_location.longitude, current_location.speed);
+                // printf("Current Location: Latitude %.6f, Longitude: %.6f, Speed: %.6f \n", current_location.latitude, current_location.longitude, current_location.speed);
                 current_distance = haversine_distance(current_location, target_location);
                 if (totalDistanceNeeded > 0) {
                     progress = ((totalDistanceNeeded - current_distance) / totalDistanceNeeded) * 100;
                     printf("Progress: %.2f%%\n", progress);
                     if (progress < 0) {
                         progress = 0;
-                    } else if (current_distance <= 0.2) { // If within 200 meters of target
+                    } else if (current_distance <= THRESHOLD_REACH) { // Consider reach if within threshold
                         progress = 100;
-                        sleepForMs(2000);
-                        target_set = false;
+                        // Sleep for 3 seconds before resetting target to display NeoPixel longer
+                        sleepForMs(SLEEP_TIME_FOR_PROGRESS_FULL);
+                        RoadTracker_resetData();
                     }
                 }
             }
         }
         sleepForMs(200);
-        // For testing
-        // target_set = true;
-        // progress = 0;
-        // sleepForMs(3000);
-        // progress = 25;
-        // sleepForMs(3000);
-        // progress = 50;
-        // sleepForMs(3000);
-        // progress = 75;
-        // sleepForMs(3000);
-        // progress = 100;
-        // sleepForMs(10000);
-        // target_set = false;
-        // progress = 0;
-        // sleepForMs(3000);
     }
     return NULL;
 }
+
+// If possible, calling it when microphone receive keyword such as "reset target"
+void RoadTracker_resetTarget() {
+    assert(isInitialized);
+    pthread_mutex_lock(&roadTrackerMutex); // Lock the mutex before resetting target
+    RoadTracker_resetData();
+    runCommand("espeak 'Target location reset successfully' -w resetTarget.wav");
+    runCommand("aplay -q resetTarget.wav");
+    pthread_mutex_unlock(&roadTrackerMutex); // Unlock the mutex after resetting target
+}
+
 // Expecting to be call from microphone
 // Function to set the target location
 // It will play the audio to let user know the target location is set or not
-static void resetLocationInfo() {
+void RoadTracker_setTarget(char *address) {
+    assert(isInitialized);
+    pthread_mutex_lock(&roadTrackerMutex); // Lock the mutex before setting target
+    target_location = StreetAPI_get_lat_long(address);
+    souruce_location  = GPS_getLocation();
+    printf("Target Location: Latitude %.6f, Longitude %.6f\n", target_location.latitude, target_location.longitude);
+    if (target_location.latitude == INVALID_LATITUDE) {
+        printf("Fail to set the Target Location due to invalid address. Check the address again !\n");
+        runCommand("espeak 'Fail to set the Target Location due to invalid input address. Check the input address again ' -w invalidTargetError.wav");
+        runCommand("aplay -q invalidTargetError.wav");
+        RoadTracker_resetData();
+    } else if (souruce_location.latitude == INVALID_LATITUDE) {
+        printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again!\n");
+        runCommand("espeak 'Fail to set the Target Location due to invalid current location. Check the GPS signal again ' -w invalidCurrentError.wav");
+        runCommand("aplay -q invalidCurrentError.wav");
+        RoadTracker_resetData();
+    } else {
+        // Set target Information
+        totalDistanceNeeded = haversine_distance(souruce_location, target_location);
+        strncpy(target_address, address, sizeof(target_address) - 1);
+        target_address[sizeof(target_address) - 1] = '\0'; // Ensure null termination
+
+        printf("Target set to: Latitude %.6f, Longitude %.6f | Source Location: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, souruce_location.latitude, souruce_location.longitude, totalDistanceNeeded);
+        char sucessSetMsg[512]; // Adjust size if needed
+        snprintf(sucessSetMsg, sizeof(sucessSetMsg), "espeak 'Successfully setting the target destination to %s' -w successSet.wav", target_address);
+        runCommand(sucessSetMsg);
+        runCommand("aplay -q successSet.wav");
+        target_set = true;
+    }
+    pthread_mutex_unlock(&roadTrackerMutex); // Unlock the mutex after setting target
+}
+
+static void RoadTracker_resetData() {
+    target_set = false;
     target_location.latitude = INVALID_LATITUDE;
     target_location.longitude = INVALID_LONGITUDE;
     souruce_location.latitude = INVALID_LATITUDE;
@@ -130,43 +141,40 @@ static void resetLocationInfo() {
     current_location.longitude = INVALID_LONGITUDE;
     totalDistanceNeeded = -1;
     current_distance = -1;
+    strcpy(target_address, "");
     progress = 0;
 }
 
-bool RoadTracker_setTarget(char *address) {
-    assert(isInitialized);
-    target_location = StreetAPI_get_lat_long(address);
-    printf("Target Location: Latitude %.6f, Longitude %.6f\n", target_location.latitude, target_location.longitude);
-    if (target_location.latitude == INVALID_LATITUDE) {
-        strcpy(target_address, "");
-        runCommand("espeak 'Fail to set the Target Location due to invalid input address. Check the input address again ' -w invalidTargetError.wav");
-        runCommand("aplay -q invalidTargetError.wav");
-        // printf("Fail to set the Target Location due to invalid address. Check the address again !\n");
-        resetLocationInfo();
-        return false;
-    }
-    souruce_location  = GPS_getLocation();
-    if (souruce_location.latitude == INVALID_LATITUDE) {
-        strcpy(target_address, "");
-        runCommand("espeak 'Fail to set the Target Location due to invalid current location. Check the GPS signal again ' -w invalidCurrentError.wav");
-        runCommand("aplay -q invalidCurrentError.wav");
-        // printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again !\n");
-        resetLocationInfo();
-        return false;
+// Convert degrees to radians
+static double deg_to_rad(double deg) {
+    return deg * (M_PI / 180.0);
+}
+
+static void runCommand(const char* command) {
+    if (system(command) == -1) {
+        // printf("%s\n", command);
+        printf("error: system() command failed\n");
     } else {
-        strncpy(target_address, address, sizeof(target_address) - 1);
-        target_address[sizeof(target_address) - 1] = '\0'; // Ensure null termination
-        totalDistanceNeeded = haversine_distance(souruce_location, target_location);
-        runCommand("espeak 'Successfully setting the target destination ' -w successSet.wav");
-        runCommand("aplay -q successSet.wav");
-        target_set = true;
-        printf("Target set to: Latitude %.6f, Longitude %.6f | Source Location: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, souruce_location.latitude, souruce_location.longitude, totalDistanceNeeded);
-        return true;
+        // printf("%s\n", command);
     }
 }
 
+// Haversine formula to calculate distance between two locations
+static double haversine_distance(struct location loc1, struct location loc2) {
+    double dlat = deg_to_rad(loc2.latitude - loc1.latitude);
+    double dlon = deg_to_rad(loc2.longitude - loc1.longitude);
+
+    double a = sin(dlat / 2) * sin(dlat / 2) +
+               cos(deg_to_rad(loc1.latitude)) * cos(deg_to_rad(loc2.latitude)) *
+               sin(dlon / 2) * sin(dlon / 2);
+
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return EARTH_RADIUS * c; // Distance in kilometers
+}
 
 struct location RoadTracker_getSourceLocation(void) {
+    assert(isInitialized);
     return souruce_location;
 }
 

@@ -21,7 +21,7 @@ static bool isInitialized = false;
 static bool isParking = false;
 static atomic_int mode = 2; //1 for handbranke reminder, 2 for flat surface detection //0 for travel tracking
 static atomic_int color = 0; //0 red bad, 1 yellow decent, 2 green good
-static bool firstime = true;
+static bool reset = true;
 
 static int prevColor = 2; // Assume green initially
 
@@ -62,11 +62,8 @@ static void* modeThreadFunc(void* args) {
     assert(isInitialized);
     while (isRunning) {
         JoystickDirection data = getJoystickDirection();
-
-        struct location current_location = GPS_getLocation();
-        double gps_speed_kmh = current_location.speed;
-        if(gps_speed_kmh < 2 && firstime  && !RoadTracker_isRunning()) {
-            firstime = false;
+        if(reset  && !RoadTracker_isRunning()) {
+            reset = false;
             mode = 1; //default start handbreak reminder
         }
 
@@ -88,7 +85,7 @@ static void* parkingThreadFunc(void* arg) {
     while (isRunning) {
         while (RoadTracker_isRunning() && isRunning) { //road tracker is running
             isParking = false;
-            firstime = true;
+            reset = true;
             mode = 0;
             sleepForMs(100);
             continue;

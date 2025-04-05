@@ -180,8 +180,7 @@ int main(void)
 			k_busy_wait(10000);
 			continue;
 
-		}
-		else if (modeCode == 2) { //flat surface detection
+		} else if (modeCode == 2) { //flat surface detection
 			for(int j = 0; j < NEO_NUM_LEDS; j++) {
 				setColor(currentColor);// color depends on slope
 			}
@@ -190,8 +189,7 @@ int main(void)
 			// Keep looping in case we plug in NeoPixel later
 			k_busy_wait(10000);
 			continue;
-		}
-		else {
+		} else if (modeCode == 0){ //travel tracking
 			for(int j = 0; j < NEO_NUM_LEDS; j++) {
 				if (j <= progress_raw) {
 					setColor(currentColor);
@@ -204,6 +202,14 @@ int main(void)
 			// Keep looping in case we plug in NeoPixel later
 			k_busy_wait(10000);
 			continue;
+		} else { // No effect
+			for(int j = 0; j < NEO_NUM_LEDS; j++) {
+				setColor(0x00000000); //off
+			}
+			gpio_pin_set_dt(&neopixel, 0);
+			NEO_DELAY_RESET();
+			// Keep looping in case we plug in NeoPixel later
+			k_busy_wait(10000);
 		}
 
 		gpio_pin_set_dt(&neopixel, 0);

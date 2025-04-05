@@ -1,0 +1,27 @@
+// These are the hardcode gps location data which might be used during the demo. 
+// In the demo, we can run our program in one terminal and running the "echo" command below to set the data in another terminal.
+// The data will be write into a file call "demo_gps.txt" and the hal/gps.c will read it.
+
+// Starting point
+49.26344711464633
+-122.83754581814372
+50 
+echo -e "49.26344711464633\n-122.83754581814372\n50" > demo_gps.txt
+
+// Middle
+49.263363097249844
+-122.88428062631041
+70 
+echo -e "49.263363097249844\n-122.88428062631041\n70" > demo_gps.txt
+
+// Close to SFU
+49.2787269888022
+-122.92057119116245
+30
+echo -e "49.2787269888022\n-122.92057119116245\n30" > demo_gps.txt
+
+// SFU
+49.276710
+-122.917803
+20
+echo -e "49.276710\n-122.917803\n40" > demo_gps.txt

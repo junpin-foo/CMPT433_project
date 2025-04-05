@@ -9,7 +9,7 @@
 #include "streetAPI.h"
 
 void RoadTracker_init();
-bool RoadTracker_setTarget(char* address);
+void RoadTracker_setTarget(char* address);
 void RoadTracker_cleanup();
 
 // Function to get the current location
@@ -25,5 +25,7 @@ char* RoadTracker_getTargetAddress();
 double RoadTracker_getProgress();
 
 bool RoadTracker_isRunning();
+
+void RoadTracker_resetTarget();
 
 #endif // ROADTRACKER_H

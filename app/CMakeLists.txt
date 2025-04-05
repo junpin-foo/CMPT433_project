@@ -19,5 +19,12 @@ add_custom_command(TARGET project POST_BUILD
      "~/cmpt433/public/project" 
   COMMENT "Copying ARM executable to public NFS directory")
 
+# Copy the GPS txt data for demo
+add_custom_command(TARGET project POST_BUILD 
+COMMAND "${CMAKE_COMMAND}" -E copy 
+    "${CMAKE_SOURCE_DIR}/demo_gps.txt"
+    "~/cmpt433/public/demo_gps.txt" 
+COMMENT "Copying GPS txt data for demo")
+
 find_library(GPIOD_LIBRARY gpiod)       
 target_link_libraries(project LINK_PRIVATE gpiod)

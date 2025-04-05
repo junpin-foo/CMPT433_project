@@ -9,8 +9,8 @@
 
 #define API_URL_ADRESS "https://nominatim.openstreetmap.org/search?format=json&q="
 #define API_URL_LAT_LON "https://nominatim.openstreetmap.org/reverse?format=json&lat=%f&lon=%f"
-static bool isInitialize = false;
 
+static bool isInitialize = false;
 void StreetAPI_init(){
     assert(!isInitialize);
     isInitialize = true;

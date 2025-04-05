@@ -29,6 +29,7 @@
 #define RED_LED &leds[1]
 #define PROGRESS_PER_LED 12.5
 #define MAX_NUM_LED 8
+#define REMOVE_LED_MODE_NUMBER 10
 
 static bool isInitialized = false;
 static pthread_t LEDpthread;
@@ -56,6 +57,14 @@ volatile void* getR5MmapAddr(void)
     close(fd);
 
     return pR5Base;
+}
+
+static void freeR5MmapAddr(volatile uint8_t* pR5Base)
+{
+    if (munmap((void*) pR5Base, MEM_LENGTH)) {
+        perror("R5 munmap failed");
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -87,9 +96,9 @@ void* LED_thread(void* arg)
             Led_setBrightness(GREEN_LED, 0);
         }
         if (!Parking_Activate()) {
-            printf("Parking not activated\n");
+            // printf("Parking not activated\n");
             MEM_UINT32((uint8_t*)pR5Base + MODE_OFFSET) = 0;
-            // From 1 to 8 in neopixel
+            // 0 to 8 in here
             int led_on = RoadTracker_getProgress()/PROGRESS_PER_LED;
             int color = SpeedLED_getLEDColor();
             // int progress = 7;
@@ -98,15 +107,17 @@ void* LED_thread(void* arg)
             MEM_UINT32((uint8_t*)pR5Base + PROGRESS_OFFSET) = led_on;
             MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = color;
         } else {
-            printf("Parking activated\n");
-            printf("modenumber: %d\n", Parking_getMode());
-            printf("color: %d\n", Parking_getMode());
+            // printf("Parking activated\n");
+            // printf("modenumber: %d\n", Parking_getMode());
+            // printf("color: %d\n", Parking_getMode());
             MEM_UINT32((uint8_t*)pR5Base + MODE_OFFSET) = Parking_getMode();
             MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = Parking_getColor();
         }
         sleepForMs(1000);
     }
-    MEM_UINT32((uint8_t*)pR5Base + COLOR_OFFSET) = 4;
+    // Remove LED effect by setting invalid mode number
+    MEM_UINT32((uint8_t*)pR5Base + MODE_OFFSET) = REMOVE_LED_MODE_NUMBER;
+    freeR5MmapAddr(pR5Base);
     return NULL;
 }
 

@@ -24,16 +24,19 @@ int main() {
     Joystick_initialize();
     Accelerometer_initialize();
     GPS_init();
+    // Calling this will enable a thread read the gps data from demo_gps.txt. See "demo_locationData.txt" in project folder for more info"
     // GPS_demoInit();
     SpeedLED_init();
     StreetAPI_init();
     RoadTracker_init();
-    // UpdateLcd_init();
+    // UpdateLcd_init(); // LCD removed due to compatible issue with GPS after updating it to highspeed
     Parking_init();
     NeoPixel_init();
     while (true) {
         if (Joystick_isButtonPressed()) {
-            RoadTracker_setTarget("Simon Fraser University");
+            // RoadTracker_setTarget("13450 102 Ave #250, Surrey, BC V3T 0A3");
+            RoadTracker_setTarget("Simon Fraser University"); // Will be remove when the microphone is implemented
+            // RoadTracker_resetTarget();
             // Handle joystick button press
             // break;
         } 
@@ -46,7 +49,6 @@ int main() {
     RoadTracker_cleanup();
     StreetAPI_cleanup();
     SpeedLED_cleanup();
-    Led_cleanUp();
     GPS_cleanup();
     Joystick_cleanUp();
     Parking_cleanup();
