@@ -27,7 +27,7 @@
 
 #define GREEN_LED &leds[0]
 #define RED_LED &leds[1]
-#define PROGRESS_PER_LED 12.5
+#define PROGRESS_PER_LED 14
 #define MAX_NUM_LED 8
 #define REMOVE_LED_MODE_NUMBER 10
 
@@ -89,17 +89,28 @@ void* LED_thread(void* arg)
     while (isRunning) {
         // progress = (progress + 1)%9;
         if (GPS_hasSignal()) {
+            Led_setTrigger(RED_LED, "none");
+            Led_setBrightness(RED_LED, 0);
             Led_setTrigger(GREEN_LED, "none");
             Led_setBrightness(GREEN_LED, 1);
+
         } else {
             Led_setTrigger(GREEN_LED, "none");
             Led_setBrightness(GREEN_LED, 0);
+            Led_setTrigger(RED_LED, "none");
+            Led_setBrightness(RED_LED, 1);
         }
         if (!Parking_Activate()) {
             // printf("Parking not activated\n");
             MEM_UINT32((uint8_t*)pR5Base + MODE_OFFSET) = 0;
             // 0 to 8 in here
-            int led_on = RoadTracker_getProgress()/PROGRESS_PER_LED;
+            int led_on = 1;
+            double progress = RoadTracker_getProgress();
+            if (progress >= 100) {
+                led_on = MAX_NUM_LED;
+            } else if (progress > 0) {
+                led_on = (int)(progress / PROGRESS_PER_LED) + led_on;
+            }
             int color = SpeedLED_getLEDColor();
             // int progress = 7;
             // printf("led_on: %d\n", led_on);

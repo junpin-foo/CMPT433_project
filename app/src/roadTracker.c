@@ -15,7 +15,7 @@
 #define EARTH_RADIUS 6371.0 // Radius of Earth in kilometers
 #define M_PI 3.14159265358979323846
 #define THRESHOLD_REACH 0.3
-#define SLEEP_TIME_FOR_PROGRESS_FULL 3000
+#define SLEEP_TIME_FOR_PROGRESS_FULL 5000
 
 static pthread_t roadTrackerThread;
 static bool isRunning = false;
@@ -120,13 +120,12 @@ void RoadTracker_setTarget(char *address) {
         totalDistanceNeeded = haversine_distance(souruce_location, target_location);
         strncpy(target_address, address, sizeof(target_address) - 1);
         target_address[sizeof(target_address) - 1] = '\0'; // Ensure null termination
-
+        target_set = true;
         printf("Target set to: Latitude %.6f, Longitude %.6f | Source Location: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, souruce_location.latitude, souruce_location.longitude, totalDistanceNeeded);
         char sucessSetMsg[512]; // Adjust size if needed
         snprintf(sucessSetMsg, sizeof(sucessSetMsg), "espeak 'Successfully setting the target destination to %s' -w successSet.wav", target_address);
         runCommand(sucessSetMsg);
         runCommand("aplay -q successSet.wav");
-        target_set = true;
     }
     pthread_mutex_unlock(&roadTrackerMutex); // Unlock the mutex after setting target
 }

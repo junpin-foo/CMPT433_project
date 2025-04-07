@@ -34,8 +34,8 @@ int main() {
     NeoPixel_init();
     while (true) {
         if (Joystick_isButtonPressed()) {
-            // RoadTracker_setTarget("13450 102 Ave #250, Surrey, BC V3T 0A3");
-            RoadTracker_setTarget("Simon Fraser University"); // Will be remove when the microphone is implemented
+            RoadTracker_setTarget("13450 102 Ave #250, Surrey, BC V3T 0A3");
+            // RoadTracker_setTarget("Simon Fraser University"); // Will be remove when the microphone is implemented
             // RoadTracker_resetTarget();
             // Handle joystick button press
             // break;
