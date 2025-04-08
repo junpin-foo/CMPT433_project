@@ -118,7 +118,7 @@ int get_speed_limit(double latitude, double longitude) {
                             if (highway && cJSON_IsString(highway)) {
                                 int estimated_speed = estimate_speed_limit(highway->valuestring);
                                 if (estimated_speed != -3) {
-                                    printf("Estimated speed limit based on road type (%s)\n", highway->valuestring);
+                                    // printf("Estimated speed limit based on road type (%s)\n", highway->valuestring);
                                     cJSON_Delete(json);
                                     free(chunk.memory);
                                     curl_easy_cleanup(curl);

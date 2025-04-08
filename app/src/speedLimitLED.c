@@ -66,7 +66,7 @@ static void* updateSpeedLimitFunc(void* arg) {
         if(speedLimitResp > 0) {
             speedLimit = speedLimitResp;
         }
-        printf("Speed Limit: %d km/h\n", speedLimit);
+        // printf("Speed Limit: %d km/h\n", speedLimit);
     
         sleepForMs(SAMPLING_PERIOD_MS);
         

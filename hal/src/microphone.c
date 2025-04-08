@@ -8,7 +8,8 @@
  #include "hal/rotary_state.h"
  #include "hal/gpio.h"
  #include "ai_api.h"
- 
+ #include "roadTracker.h"
+
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
@@ -87,7 +88,7 @@ static const char* my_strcasestr(const char* haystack, const char* needle) {
 // Function to parse location from transcription
 static char* parse_location(const char* transcription) {
     // Check if transcription contains the trigger phrase
-    const char* trigger = "hey beagle set target to";
+    const char* trigger = "set target";
     const char* pos = my_strcasestr(transcription, trigger);
     
     if (pos) {
@@ -169,7 +170,7 @@ static void *record_audio(void *arg) {
     // Command to record audio and write to both the WAV file and the path
     char cmd[2048];
     snprintf(cmd, sizeof(cmd), 
-            "arecord --device=hw:2,0 --format=S16_LE --rate=44100 -c1 | tee %s > %s",
+            "arecord --device=hw:2,0 --format=S16_LE --rate=44100 -c1 -d 7 | tee %s > %s",
             path, output_path);
     
     // Start the recording process
@@ -326,6 +327,7 @@ static void *record_audio(void *arg) {
             char* ai_response = AI_processText(location_query);
             if (ai_response) {
                 printf("AI response 1: %s\n", ai_response);
+                RoadTracker_setTarget(ai_response);
             } else {
                 printf("Failed to get formatted address\n");
             }
@@ -405,7 +407,6 @@ static void *button_listener(void *arg) {
      if (listener_active) {
          Microphone_stopButtonListener();
      }
-     
      // Clean up rotary state
      RotaryState_cleanup();
  }
@@ -450,17 +451,18 @@ static void *button_listener(void *arg) {
  
  // Stop recording audio
  int Microphone_stopRecording(void) {
-     pthread_mutex_lock(&mic_mutex);
-     if (!recording_active) {
-         pthread_mutex_unlock(&mic_mutex);
-         return -1;
-     }
+    //  pthread_mutex_lock(&mic_mutex);
+    //  if (!recording_active) {
+    //      pthread_mutex_unlock(&mic_mutex);
+    //      return -1;
+    //  }
      
-     recording_active = 0;
-     pthread_mutex_unlock(&mic_mutex);
+    //  recording_active = 0;
+    //  pthread_mutex_unlock(&mic_mutex);
      
-     // Wait for recording thread to finish
-     pthread_join(record_thread, NULL);
+    //  // Wait for recording thread to finish
+    //  pthread_join(record_thread, NULL);
+    pthread_cancel(record_thread);
      
      return 0;
  }
@@ -622,17 +624,18 @@ static void *button_listener(void *arg) {
  
  // Stop the listener thread
  void Microphone_stopButtonListener(void) {
-     pthread_mutex_lock(&mic_mutex);
-     if (!listener_active) {
-         pthread_mutex_unlock(&mic_mutex);
-         return;
-     }
+    //  pthread_mutex_lock(&mic_mutex);
+    //  if (!listener_active) {
+    //      pthread_mutex_unlock(&mic_mutex);
+    //      return;
+    //  }
      
-     listener_active = 0;
-     pthread_mutex_unlock(&mic_mutex);
+    //  listener_active = 0;
+    //  pthread_mutex_unlock(&mic_mutex);
      
-     // Wait for listener thread to finish
-     pthread_join(button_listener_thread, NULL);
+    //  // Wait for listener thread to finish
+    //  pthread_join(button_listener_thread, NULL);
+     pthread_cancel(button_listener_thread);
  }
  
  // Register a callback function to be called when speech recognition completes

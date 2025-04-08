@@ -77,7 +77,7 @@ def process_transcription(transcription_file="app_output/transcribed_output.txt"
         if not transcription:
             return "No transcription found or empty transcription"
         
-        print(f"Processing transcription: {transcription}")
+        # print(f"Processing transcription: {transcription}")
         
         # Configure the API
         if not configure_genai():
