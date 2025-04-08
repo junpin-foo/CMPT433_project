@@ -6,6 +6,7 @@
 #include <math.h>
 #include <sys/wait.h>
 #include <assert.h>
+#include <ctype.h>
 #include "hal/GPS.h"
 #include "streetAPI.h"
 #include "sleep_and_timer.h"
@@ -96,14 +97,24 @@ void RoadTracker_resetTarget() {
     pthread_mutex_unlock(&roadTrackerMutex); // Unlock the mutex after resetting target
 }
 
+static void rtrim(char *str) {
+    int len = strlen(str);
+    while (len > 0 && isspace((unsigned char)str[len - 1])) {
+        len--;
+    }
+    str[len] = '\0';
+}
+
+
 // Expecting to be call from microphone
 // Function to set the target location
 // It will play the audio to let user know the target location is set or not
 void RoadTracker_setTarget(char *address) {
     assert(isInitialized);
     pthread_mutex_lock(&roadTrackerMutex); // Lock the mutex before setting target
-    target_location = StreetAPI_get_lat_long(address);
     souruce_location  = GPS_getLocation();
+    rtrim(address);
+    target_location = StreetAPI_get_lat_long(address);
     printf("Target Location: Latitude %.6f, Longitude %.6f\n", target_location.latitude, target_location.longitude);
     if (target_location.latitude == INVALID_LATITUDE) {
         printf("Fail to set the Target Location due to invalid address. Check the address again !\n");

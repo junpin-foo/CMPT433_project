@@ -21,23 +21,50 @@
 #include "parking.h"
 #include "hal/led.h"
 
-// // Global flag to control program execution.
-// // Note: Defined without static so that it is visible to other files.
-// volatile int running = 1;
-// static volatile int force_exit_counter = 0;
+// static int running = 1;
+int main() {
+    Ic2_initialize();
+    Gpio_initialize();
+    Joystick_initialize();
+    Accelerometer_initialize();
+    // GPS_init();
+    // Calling this will enable a thread read the gps data from demo_gps.txt. See "demo_locationData.txt" in project folder for more info"
+    GPS_demoInit();
+    SpeedLED_init();
+    StreetAPI_init();
+    RoadTracker_init();
+    Parking_init();
+    NeoPixel_init();
+    RotaryState_init();
+    Microphone_init();
 
-// void on_location_received(const char* formatted_location) {
-//     printf("Setting navigation target to: %s\n", formatted_location);
-//     char location_copy[256];
-//     strncpy(location_copy, formatted_location, sizeof(location_copy) - 1);
-//     location_copy[sizeof(location_copy) - 1] = '\0';
-//     RoadTracker_setTarget(location_copy);
-// }
+    // Start the button listener thread
+    if (Microphone_startButtonListener() == 0) {
+        printf("Button listener started. Press the rotary encoder button to record audio.\n");
+    } else {
+        printf("Failed to start button listener.\n");
+    }
+    
+    while (true) {
+        if (Joystick_isButtonPressed()) {
+            break;
+        } 
+        sleepForMs(100);
+    }
 
-// void on_clear_target_received(void) {
-//     printf("Clearing navigation target\n");
-//     RoadTracker_resetTarget();
-// }
+    Microphone_cleanup();
+    NeoPixel_cleanUp();
+    RoadTracker_cleanup();
+    StreetAPI_cleanup();
+    SpeedLED_cleanup();
+    GPS_cleanup();
+    Joystick_cleanUp();
+    Parking_cleanup();
+    Gpio_cleanup();
+    Accelerometer_cleanUp();
+    Ic2_cleanUp();
+    return 0;
+}
 
 // // Add the voice control shutdown callback
 // void on_shutdown_command_received(void) {
@@ -65,12 +92,8 @@
 //     alarm(3);
 // }
 
-// // Alarm handler for forced exit
-// void handle_alarm(int sig) {
-//     (void)sig;  // Unused parameter
-//     printf("\nShutdown timeout reached. Forcing exit...\n");
-//     _exit(1);
-// }
+// Flag to control program execution
+// static int running = 1;
 
 // int main() {
 //     if (setpgid(0, 0) < 0) {
@@ -151,36 +174,3 @@
 //     printf("Application terminated gracefully.\n");
 //     return 0;
 // }
-
-
-// Flag to control program execution
-static int running = 1;
-
-int main() {
-    Gpio_initialize();
-    RotaryState_init();
-    Microphone_init();
-
-    
-    // Start the button listener thread
-    if (Microphone_startButtonListener() == 0) {
-        printf("Button listener started. Press the rotary encoder button to record audio.\n");
-    } else {
-        printf("Failed to start button listener.\n");
-    }
-
-    // Main loop
-    while (running) {
-
-        sleep(1);
-    }
-
-    // Cleanup and exit
-    Microphone_stopButtonListener();
-    Microphone_cleanup();
-    RotaryState_cleanup();
-    Gpio_cleanup();
-
-    printf("Exiting...\n");
-    return 0;
-}

@@ -26,7 +26,6 @@ COMMAND "${CMAKE_COMMAND}" -E copy
     "~/cmpt433/public/demo_gps.txt" 
 COMMENT "Copying GPS txt data for demo")
 
-
 add_custom_command(TARGET project POST_BUILD 
 COMMAND "${CMAKE_COMMAND}" -E copy 
     "${CMAKE_SOURCE_DIR}/app/src/ai_api.py"
@@ -36,7 +35,7 @@ COMMENT "Copying ai_api.py")
 
 add_custom_command(TARGET project POST_BUILD 
 COMMAND "${CMAKE_COMMAND}" -E copy 
-    "${CMAKE_SOURCE_DIR}/app/src/ai_api.py"
+    "${CMAKE_SOURCE_DIR}/app/src/my_speech.py"
     "~/cmpt433/public/my_speech.py" 
 COMMENT "Copying my_speech.py")
 

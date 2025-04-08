@@ -40,36 +40,20 @@ def configure_genai():
         return False
 
 def get_gemini_response(prompt):
-    """Get a response from the Gemini API with a clean format"""
+    """Get a response from the Gemini API with a shortened request"""
     try:
         import google.generativeai as genai
         
-        # Detect if this is a location query
-        if "Provide only the full address in standard format for:" in prompt:
-            # Make the response cleaner - just the address, no explanation
-            response_prompt = prompt.strip()
-        else:
-            # For normal queries, keep the standard format
-            response_prompt = f"{prompt} keep it short and don't respond to keeping it short"
+        # This is added to the end of the prompt, chose to keep it short because otherwise it is long
+        modified_prompt = f"{prompt} keep it short and don't respond to keeping it short. no longer than one short sentence. dont add any special characters to the prompt. no dashes in your reply. no apostraphes, no grammar"
         
-        # 2.0 flash should be a balanced model
+        # 2.0 flash should be a balanced model, lite is too weak...
         model = genai.GenerativeModel('gemini-2.0-flash')
         
         # Get response with timeout
-        response = model.generate_content(response_prompt)
+        response = model.generate_content(modified_prompt)
         
-        # For location queries, make sure we only return the address
-        if "Provide only the full address in standard format for:" in prompt:
-            # Extract just the address, no extra text
-            response_text = response.text.strip()
-            
-            # If there are multiple lines, take the last line which should be just the address
-            if "\n" in response_text:
-                response_text = response_text.split("\n")[-1].strip()
-                
-            return response_text
-        else:
-            return response.text
+        return response.text
     except KeyboardInterrupt:
         print("API request interrupted")
         return "Request was interrupted. Please try again."
@@ -77,7 +61,6 @@ def get_gemini_response(prompt):
         print(f"Error getting Gemini response: {str(e)}")
         return f"Error: {str(e)}"
 
-        
 def process_transcription(transcription_file="app_output/transcribed_output.txt"):
     """Process a transcription file and get AI response"""
     try:
@@ -94,7 +77,7 @@ def process_transcription(transcription_file="app_output/transcribed_output.txt"
         if not transcription:
             return "No transcription found or empty transcription"
         
-        print(f"Processing transcription: {transcription}")
+        # print(f"Processing transcription: {transcription}")
         
         # Configure the API
         if not configure_genai():
