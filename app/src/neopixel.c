@@ -1,6 +1,5 @@
 #include "hal/i2c.h"
 #include "hal/gpio.h"
-#include "hal/lcd.h"
 #include "sleep_and_timer.h"
 
 #include <fcntl.h>

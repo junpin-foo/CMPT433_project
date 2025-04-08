@@ -12,6 +12,7 @@
 #include "sleep_and_timer.h"
 #include "roadTracker.h"
 #include <stdatomic.h>
+#include "speedLimitLED.h"
 
 #define EARTH_RADIUS 6371.0 // Radius of Earth in kilometers
 #define M_PI 3.14159265358979323846
@@ -66,23 +67,27 @@ static void* trackLocationThreadFunc(void* arg) {
                 printf("Invalid Current Location. Check GPS signal !\n");
             } else {
                 current_location  = GPS_getLocation();
-                // printf("Current Location: Latitude %.6f, Longitude: %.6f, Speed: %.6f \n", current_location.latitude, current_location.longitude, current_location.speed);
                 current_distance = haversine_distance(current_location, target_location);
                 if (totalDistanceNeeded > 0) {
                     progress = ((totalDistanceNeeded - current_distance) / totalDistanceNeeded) * 100;
-                    printf("Progress: %.2f%%\n", progress);
+                    // printf("Progress: %.2f%%\n", progress);
                     if (progress < 0) {
                         progress = 0;
                     } else if (current_distance <= THRESHOLD_REACH) { // Consider reach if within threshold
                         progress = 100;
-                        // Sleep for 3 seconds before resetting target to display NeoPixel longer
-                        sleepForMs(SLEEP_TIME_FOR_PROGRESS_FULL);
-                        RoadTracker_resetData();
                     }
+                }
+                if (progress == 100) {
+                    // Sleep for 3 seconds before resetting target to display NeoPixel longer
+                    printf("Target: Latitude %.6f, Longitude: %.6f, Current: Latitude %.6f, Longitude: %.6f, Speed: %.6f, Speed Limit: %d, progress: %.2f\n",target_location.latitude, target_location.longitude, current_location.latitude, current_location.longitude, current_location.speed, SpeedLED_getSpeedLimit(), progress);
+                    sleepForMs(SLEEP_TIME_FOR_PROGRESS_FULL);
+                    RoadTracker_resetData();
+                } else {
+                    printf("Target: Latitude %.6f, Longitude: %.6f, Current: Latitude %.6f, Longitude: %.6f, Speed: %.6f, Speed Limit: %d, progress: %.2f\n",target_location.latitude, target_location.longitude, current_location.latitude, current_location.longitude, current_location.speed, SpeedLED_getSpeedLimit(), progress);
                 }
             }
         }
-        sleepForMs(200);
+        sleepForMs(300);
     }
     return NULL;
 }
@@ -92,7 +97,7 @@ void RoadTracker_resetTarget() {
     assert(isInitialized);
     pthread_mutex_lock(&roadTrackerMutex); // Lock the mutex before resetting target
     RoadTracker_resetData();
-    runCommand("espeak 'Target location reset successfully' -w resetTarget.wav");
+    runCommand("espeak -v mb-en1 -s 120  'Target location reset successfully' -w resetTarget.wav");
     runCommand("aplay -q resetTarget.wav");
     pthread_mutex_unlock(&roadTrackerMutex); // Unlock the mutex after resetting target
 }
@@ -118,12 +123,12 @@ void RoadTracker_setTarget(char *address) {
     printf("Target Location: Latitude %.6f, Longitude %.6f\n", target_location.latitude, target_location.longitude);
     if (target_location.latitude == INVALID_LATITUDE) {
         printf("Fail to set the Target Location due to invalid address. Check the address again !\n");
-        runCommand("espeak 'Fail to set the Target Location due to invalid input address. Check the input address again ' -w invalidTargetError.wav");
+        runCommand("espeak -v mb-en1 -s 120  'Fail to set the Target Location due to invalid input address. Check the input address again ' -w invalidTargetError.wav");
         runCommand("aplay -q invalidTargetError.wav");
         RoadTracker_resetData();
     } else if (souruce_location.latitude == INVALID_LATITUDE) {
         printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again!\n");
-        runCommand("espeak 'Fail to set the Target Location due to invalid current location. Check the GPS signal again ' -w invalidCurrentError.wav");
+        runCommand("espeak -v mb-en1 -s 120  'Fail to set the Target Location due to invalid current location. Check the GPS signal again ' -w invalidCurrentError.wav");
         runCommand("aplay -q invalidCurrentError.wav");
         RoadTracker_resetData();
     } else {
@@ -134,7 +139,7 @@ void RoadTracker_setTarget(char *address) {
         target_set = true;
         printf("Target set to: Latitude %.6f, Longitude %.6f | Source Location: Latitude %.6f, Longitude %.6f | Total Distance: %.2f km\n", target_location.latitude, target_location.longitude, souruce_location.latitude, souruce_location.longitude, totalDistanceNeeded);
         char sucessSetMsg[512]; // Adjust size if needed
-        snprintf(sucessSetMsg, sizeof(sucessSetMsg), "espeak 'Successfully setting the target destination to %s' -w successSet.wav", target_address);
+        snprintf(sucessSetMsg, sizeof(sucessSetMsg), "espeak -v mb-en1 -s 120 'Successfully setting the target destination to %s' -w successSet.wav", target_address);
         runCommand(sucessSetMsg);
         runCommand("aplay -q successSet.wav");
     }

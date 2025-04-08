@@ -13,6 +13,7 @@
         "speedlimitled.h": "c",
         "roadtracker.h": "c",
         "stdlib.h": "c",
-        "led.h": "c"
+        "led.h": "c",
+        "stdbool.h": "c"
     }
 }

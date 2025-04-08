@@ -12,10 +12,15 @@
 #include "stdbool.h"
 #include "sleep_and_timer.h"
 
+#define BUFFER_SIZE 255
+#define DEGREE_FACTOR 100
+#define MINUTES_IN_DEGREE 60.0
+#define KNOTS_TO_KMH 1.852
+
 int serial_port;
 static pthread_t gps_thread;
 static pthread_mutex_t gps_mutex = PTHREAD_MUTEX_INITIALIZER;  // Mutex to protect current_location
-static struct location current_location = {-1000, -1000, -1};  // Default invalid location
+static struct location current_location = {INVALID_LATITUDE, INVALID_LONGITUDE, INVALID_SPEED};  // Default invalid location
 static bool isRunning = false;
 static bool signal = false;
 static bool isInitialized = false;
@@ -114,8 +119,7 @@ static void* gps_thread2_func(void* arg) {
     return NULL;
 }
 
-// Calling this will enable a thread read the gps data from demo_gps.txt. See "demo_locationData.txt" in project folder for more info"
-// The cmake command already added the demo_gps.txt file to the /mnt/remote folder
+
 void GPS_demoInit() {
     signal = true;
     isRunning = true;
@@ -153,7 +157,7 @@ void configure_serial(int serial_port) {
 }
 
 static char* GPS_read() {
-    static char read_buf[255];
+    static char read_buf[BUFFER_SIZE];
     configure_serial(serial_port);
     while (isRunning) {  // Keep reading until we find a $GNGGA message
         int n = read(serial_port, &read_buf, sizeof(read_buf)); // Leave space for null terminator
@@ -171,8 +175,8 @@ static char* GPS_read() {
 
 static struct location parse_GPRMC(char* gnrmc_sentence) {
     char *token;
-    char temp[255];
-    struct location data = {-1000, -1000, -1};
+    char temp[BUFFER_SIZE];
+    struct location data = {INVALID_LATITUDE, INVALID_LONGITUDE, INVALID_SPEED};
     struct location invalidData = {INVALID_LATITUDE, INVALID_LONGITUDE, INVALID_SPEED};
 
     // Make a copy to avoid modifying the original
@@ -198,9 +202,9 @@ static struct location parse_GPRMC(char* gnrmc_sentence) {
     token = strtok(NULL, ",");
     if (token == NULL || strlen(token) == 0) return invalidData;
     double raw_lat = atof(token);
-    int lat_deg = (int)(raw_lat / 100);
-    double lat_min = raw_lat - (lat_deg * 100);
-    data.latitude = lat_deg + (lat_min / 60.0);
+    int lat_deg = (int)(raw_lat / DEGREE_FACTOR);
+    double lat_min = raw_lat - (lat_deg * DEGREE_FACTOR);
+    data.latitude = lat_deg + (lat_min / MINUTES_IN_DEGREE);
 
     // N/S Indicator
     token = strtok(NULL, ",");
@@ -210,9 +214,9 @@ static struct location parse_GPRMC(char* gnrmc_sentence) {
     token = strtok(NULL, ",");
     if (token == NULL || strlen(token) == 0) return invalidData;
     double raw_lon = atof(token);
-    int lon_deg = (int)(raw_lon / 100);
-    double lon_min = raw_lon - (lon_deg * 100);
-    data.longitude = lon_deg + (lon_min / 60.0);
+    int lon_deg = (int)(raw_lon / DEGREE_FACTOR);
+    double lon_min = raw_lon - (lon_deg * DEGREE_FACTOR);
+    data.longitude = lon_deg + (lon_min / MINUTES_IN_DEGREE);
 
     // E/W Indicator
     token = strtok(NULL, ",");
@@ -221,7 +225,7 @@ static struct location parse_GPRMC(char* gnrmc_sentence) {
     // Speed in knots (convert to km/h)
     token = strtok(NULL, ",");
     if (token != NULL && strlen(token) > 0) {
-        data.speed = atof(token) * 1.852;
+        data.speed = atof(token) * KNOTS_TO_KMH;
     }
     
     return data;

@@ -188,7 +188,7 @@ static void *record_audio(void *arg) {
     // Command to record audio and write to both the WAV file and the path
     char cmd[2048];
     snprintf(cmd, sizeof(cmd), 
-            "arecord --device=hw:1,0 --format=S16_LE --rate=44100 -c1 -d 7 | tee %s > %s",
+            "arecord --device=hw:2,0 --format=S16_LE --rate=44100 -c1 -d 7 | tee %s > %s",
             path, output_path);
     
     // Start the recording process
@@ -341,11 +341,11 @@ static void *record_audio(void *arg) {
             snprintf(location_query, sizeof(location_query), 
                     "Provide only the full address in standard format for: %s. Format should be like: 8888 University Dr W, Burnaby, BC V5A 1S6. Do not include any other text in your response.", location);
                     
-            // Process with AI API for location formatting
+            // Process with AI API for location formattingx
             printf("Getting formatted address for location...\n");
             char* ai_response = AI_processText(location_query);
             if (ai_response) {
-                printf("AI response 1: %s\n", ai_response);
+                printf("Location Formatted: %s\n", ai_response);
                 RoadTracker_setTarget(ai_response);
             } else {
                 printf("Failed to get formatted address\n");
@@ -359,11 +359,12 @@ static void *record_audio(void *arg) {
             printf("Getting AI response...\n");
             char* ai_response = AI_processTranscription();
             char responseAudio[1024]; // Adjust size if needed
-            snprintf(responseAudio, sizeof(responseAudio), "espeak '%s' -w aiResponse.wav", ai_response);
+            snprintf(responseAudio, sizeof(responseAudio),"espeak -v mb-en1 -s 120 '%s' -w aiResponse.wav", ai_response);
+            // snprintf(responseAudio, sizeof(responseAudio), "espeak -ven-us+f3 '%s' -a 300 -s 130 -w aiResponse.wav", ai_response);
             runCommand(responseAudio);
             runCommand("aplay -q aiResponse.wav");
             if (ai_response) {
-                printf("AI response 2: %s\n", ai_response);
+                printf("Fun Fact: %s\n", ai_response);
             } else {
                 printf("Failed to get AI response\n");
             }
@@ -520,7 +521,7 @@ static void *button_listener(void *arg) {
          return NULL;
      }
      
-     printf("Transcribing audio from %s...\n", audio_path);
+    //  printf("Transcribing audio from %s...\n", audio_path);
      
      // Check if the Python script exists in the current directory
      if (access("my_speech.py", F_OK) == -1) {
@@ -556,7 +557,7 @@ static void *button_listener(void *arg) {
              if (transcription_file) {
                  fprintf(transcription_file, "%s", transcription_result);
                  fclose(transcription_file);
-                 printf("Transcription saved to %s\n", transcription_path);
+                //  printf("Transcription saved to %s\n", transcription_path);
              } else {
                  perror("Failed to save transcription to file");
              }
@@ -649,17 +650,6 @@ static void *button_listener(void *arg) {
  
  // Stop the listener thread
  void Microphone_stopButtonListener(void) {
-    //  pthread_mutex_lock(&mic_mutex);
-    //  if (!listener_active) {
-    //      pthread_mutex_unlock(&mic_mutex);
-    //      return;
-    //  }
-     
-    //  listener_active = 0;
-    //  pthread_mutex_unlock(&mic_mutex);
-     
-    //  // Wait for listener thread to finish
-    //  pthread_join(button_listener_thread, NULL);
      pthread_cancel(button_listener_thread);
  }
  
