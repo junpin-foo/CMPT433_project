@@ -325,7 +325,7 @@ static void *record_audio(void *arg) {
             printf("Getting formatted address for location...\n");
             char* ai_response = AI_processText(location_query);
             if (ai_response) {
-                printf("AI response: %s\n", ai_response);
+                printf("AI response 1: %s\n", ai_response);
             } else {
                 printf("Failed to get formatted address\n");
             }
@@ -336,7 +336,7 @@ static void *record_audio(void *arg) {
             printf("Getting AI response...\n");
             char* ai_response = AI_processTranscription();
             if (ai_response) {
-                printf("AI response: %s\n", ai_response);
+                printf("AI response 2: %s\n", ai_response);
             } else {
                 printf("Failed to get AI response\n");
             }
@@ -496,14 +496,14 @@ static void *button_listener(void *arg) {
      printf("Transcribing audio from %s...\n", audio_path);
      
      // Check if the Python script exists in the current directory
-     if (access("speech.py", F_OK) == -1) {
-         printf("Error: speech.py not found in the current directory.\n");
+     if (access("my_speech.py", F_OK) == -1) {
+         printf("Error: my_speech.py not found in the current directory.\n");
          return NULL;
      }
      
      // Run the Python script with the audio file path - with more space for command
      char cmd[2048];  // Larger buffer to avoid truncation warnings
-     snprintf(cmd, sizeof(cmd), "python3 ./speech.py %s", audio_path);
+     snprintf(cmd, sizeof(cmd), "python3 ./my_speech.py %s", audio_path);
      
      char *output = read_command_output(cmd);
      if (!output) {
