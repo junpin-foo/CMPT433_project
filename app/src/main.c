@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
+#include <string.h>
 #include "sleep_and_timer.h"
 #include "hal/accelerometer.h"
 #include "hal/i2c.h"

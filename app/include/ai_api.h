@@ -29,7 +29,5 @@
  
  // Checks if API key is set
  bool AI_isApiKeySet(void);
-
-static char* read_command_output(const char *cmd);
  
  #endif /* AI_API_H */

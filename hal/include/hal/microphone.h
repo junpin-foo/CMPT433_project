@@ -53,5 +53,8 @@
  
  // Set whether transcription should happen automatically when recording stops
  void Microphone_setAutoTranscribe(bool enable);
+
+ void Microphone_setLocationCallback(void (*callback)(const char* location));
+
  
  #endif // HAL_MICROPHONE_H
