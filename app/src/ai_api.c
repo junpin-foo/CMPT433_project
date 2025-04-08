@@ -26,7 +26,7 @@
  static char ai_response_buffer[MAX_RESPONSE_SIZE] = {0};
  
  // The global flag defined in main.c (ensure it is declared with external linkage).
- extern volatile int running;
+//  extern volatile int running;
 
  static char* run_python_script(const char* arg) {
      int pipefd[2];
@@ -78,11 +78,11 @@
      const int TIMEOUT_SECONDS = 10;
  
      while ((time(NULL) - start_time) < TIMEOUT_SECONDS) {
-         if (!running) {
-             // Interrupt detected: kill the child process group.
-             killpg(pid, SIGKILL);
-             break;
-         }
+        //  if (!running) {
+        //      // Interrupt detected: kill the child process group.
+        //      killpg(pid, SIGKILL);
+        //      break;
+        //  }
          fd_set readfds;
          FD_ZERO(&readfds);
          FD_SET(pipefd[0], &readfds);

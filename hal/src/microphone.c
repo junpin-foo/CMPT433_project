@@ -362,8 +362,8 @@
      // Command to record audio and write to both the WAV file and the path
      char cmd[2048];
      snprintf(cmd, sizeof(cmd), 
-         "arecord --device=hw:2,0 --format=S16_LE --rate=44100 -c2 | tee %s > %s",
-         path, output_path);
+              "arecord --device=hw:2,0 --format=S16_LE --rate=44100 -c1 | tee %s > %s",
+              path, output_path);
      
      // Start the recording process
      int pipe_fd[2];

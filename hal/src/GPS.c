@@ -107,7 +107,7 @@ static void* gps_thread2_func(void* arg) {
             fclose(file);
             return 0; // failure
         }
-        printf("Demo: Current lat=%.6f, lon=%.6ff, spd=%.6f\n", current_location.latitude, current_location.longitude, current_location.speed);
+        // printf("Demo: Current lat=%.6f, lon=%.6ff, spd=%.6f\n", current_location.latitude, current_location.longitude, current_location.speed);
         pthread_mutex_unlock(&gps_mutex); // Unlock the mutex after updating
         sleepForMs(500);
     }
