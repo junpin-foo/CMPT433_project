@@ -6,7 +6,7 @@
 # Check if an API key was provided
 if [ -z "$1" ]; then
     echo "Usage: $0 <your_gemini_api_key>"
-    echo "Example: $0 AIzaSyABCD1234EFGH5678ijkl"
+    echo "Example: $0 askjdnhaksdskajajskd"
     exit 1
 fi
 

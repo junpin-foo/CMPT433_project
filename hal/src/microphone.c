@@ -37,8 +37,10 @@
  static char transcription_filename[256] = "transcribed_output.txt"; // Transcription output filename
  static void (*transcription_callback)(const char* transcription) = NULL;
  static void (*location_callback)(const char* formatted_location) = NULL;
+ static void (*clear_target_callback)(void) = NULL;  // New callback for clear target
+ static void (*shutdown_callback)(void) = NULL;  // Callback for shutdown command
  static pid_t arecord_pid = -1;
- static volatile int shutting_down = 0;
+ volatile int shutting_down = 0;  
  
  static const int MAX_RECORDING_DURATION = 15;  // 15 seconds max recording duration
  static const int SILENCE_TIMEOUT = 2;  // Silence timeout in seconds
@@ -48,106 +50,99 @@
  // Mutex for thread synchronization
  static pthread_mutex_t mic_mutex = PTHREAD_MUTEX_INITIALIZER;
  static pthread_cond_t mic_cond = PTHREAD_COND_INITIALIZER;
-
- // Add this function to microphone.c to extract just the formatted address
-// Add it before the record_audio function
-
-static char* extract_formatted_address(const char* ai_response) {
-    if (!ai_response || !*ai_response) {
-        printf("Empty AI response\n");
-        return NULL;
-    }
-    
-    printf("Raw AI response: [%s]\n", ai_response);
-    
-    // First look for a newline character
-    const char* newline = strchr(ai_response, '\n');
-    if (newline && *(newline + 1) != '\0') {
-        // There's content after the newline
-        newline++; // Skip the newline
-        
-        // Check if there's actual content (not just whitespace)
-        const char* line_start = newline;
-        while (*line_start && isspace((unsigned char)*line_start)) {
-            line_start++;
-        }
-        
-        if (*line_start) {
-            // Found content after newline, make a copy
-            char* result = strdup(line_start);
-            if (result) {
-                // Trim trailing whitespace
-                int len = strlen(result);
-                while (len > 0 && isspace((unsigned char)result[len-1])) {
-                    result[--len] = '\0';
-                }
-                
-                printf("Extracted address using newline: [%s]\n", result);
-                return result;
-            }
-        }
-    }
-    
-    // Alternative approach: look for the address at the end of the response
-    // This is more specific to the format we've seen
-    const char* end_of_prompt = strstr(ai_response, "Do not include any other text in your response.");
-    if (end_of_prompt) {
-        end_of_prompt += strlen("Do not include any other text in your response.");
-        
-        // Skip whitespace
-        while (*end_of_prompt && isspace((unsigned char)*end_of_prompt)) {
-            end_of_prompt++;
-        }
-        
-        if (*end_of_prompt) {
-            char* result = strdup(end_of_prompt);
-            if (result) {
-                // Trim trailing whitespace
-                int len = strlen(result);
-                while (len > 0 && isspace((unsigned char)result[len-1])) {
-                    result[--len] = '\0';
-                }
-                
-                printf("Extracted address using prompt end: [%s]\n", result);
-                return result;
-            }
-        }
-    }
-    
-    // If all else fails, check for anything that looks like an address format
-    const char* address_pattern = strchr(ai_response, '8');  // Assuming 8888 is there
-    if (address_pattern) {
-        // Check if this is the start of a number
-        if (isdigit((unsigned char)address_pattern[0]) && 
-            isdigit((unsigned char)address_pattern[1]) && 
-            isdigit((unsigned char)address_pattern[2]) && 
-            isdigit((unsigned char)address_pattern[3])) {
-            
-            // Likely found the address
-            char* result = strdup(address_pattern);
-            if (result) {
-                // Trim trailing whitespace
-                int len = strlen(result);
-                while (len > 0 && isspace((unsigned char)result[len-1])) {
-                    result[--len] = '\0';
-                }
-                
-                printf("Extracted address using pattern match: [%s]\n", result);
-                return result;
-            }
-        }
-    }
-    
-    printf("Could not extract address\n");
-    return NULL;
-}
  
- // Case-insensitive character comparison
+ // Add this function to microphone.c to extract just the formatted address
+ static char* extract_formatted_address(const char* ai_response) {
+     if (!ai_response || !*ai_response) {
+         printf("Empty AI response\n");
+         return NULL;
+     }
+     
+     printf("Raw AI response: [%s]\n", ai_response);
+     
+     // First look for a newline character
+     const char* newline = strchr(ai_response, '\n');
+     if (newline && *(newline + 1) != '\0') {
+         // There's content after the newline
+         newline++; // Skip the newline
+         
+         // Check if there's actual content (not just whitespace)
+         const char* line_start = newline;
+         while (*line_start && isspace((unsigned char)*line_start)) {
+             line_start++;
+         }
+         
+         if (*line_start) {
+             // Found content after newline, make a copy
+             char* result = strdup(line_start);
+             if (result) {
+                 // Trim trailing whitespace
+                 int len = strlen(result);
+                 while (len > 0 && isspace((unsigned char)result[len-1])) {
+                     result[--len] = '\0';
+                 }
+                 
+                 printf("Extracted address using newline: [%s]\n", result);
+                 return result;
+             }
+         }
+     }
+     
+     const char* end_of_prompt = strstr(ai_response, "Do not include any other text in your response.");
+     if (end_of_prompt) {
+         end_of_prompt += strlen("Do not include any other text in your response.");
+         
+         // Skip whitespace
+         while (*end_of_prompt && isspace((unsigned char)*end_of_prompt)) {
+             end_of_prompt++;
+         }
+         
+         if (*end_of_prompt) {
+             char* result = strdup(end_of_prompt);
+             if (result) {
+                 // Trim trailing whitespace
+                 int len = strlen(result);
+                 while (len > 0 && isspace((unsigned char)result[len-1])) {
+                     result[--len] = '\0';
+                 }
+                 
+                 printf("Extracted address using prompt end: [%s]\n", result);
+                 return result;
+             }
+         }
+     }
+     
+     const char* address_pattern = strchr(ai_response, '8'); 
+     if (address_pattern) {
+         // Check if this is the start of a number
+         if (isdigit((unsigned char)address_pattern[0]) && 
+             isdigit((unsigned char)address_pattern[1]) && 
+             isdigit((unsigned char)address_pattern[2]) && 
+             isdigit((unsigned char)address_pattern[3])) {
+             
+             // Likely found the address
+             char* result = strdup(address_pattern);
+             if (result) {
+                 // Trim trailing whitespace
+                 int len = strlen(result);
+                 while (len > 0 && isspace((unsigned char)result[len-1])) {
+                     result[--len] = '\0';
+                 }
+                 
+                 printf("Extracted address using pattern match: [%s]\n", result);
+                 return result;
+             }
+         }
+     }
+     
+     printf("Could not extract address\n");
+     return NULL;
+ }
+ 
  static int char_icmp(char a, char b) {
      return tolower((unsigned char)a) - tolower((unsigned char)b);
  }
  
- // Case-insensitive string search
  static const char* my_strcasestr(const char* haystack, const char* needle) {
      if (!haystack || !needle) return NULL;
      
@@ -173,6 +168,24 @@ static char* extract_formatted_address(const char* ai_response) {
      }
      
      return NULL;
+ }
+ 
+ // Function to check if transcription contains the clear target command
+ static bool contains_clear_target(const char* transcription) {
+     const char* trigger = "clear target";
+     return my_strcasestr(transcription, trigger) != NULL;
+ }
+ 
+ static bool contains_shutdown_command(const char* transcription) {
+     if (!transcription) {
+         return false;
+     }
+     
+     const char* trigger1 = "hey beagle shutdown";
+     const char* trigger2 = "hey beagle shut down";
+     
+     return (my_strcasestr(transcription, trigger1) != NULL || 
+             my_strcasestr(transcription, trigger2) != NULL);
  }
  
  // Function to parse location from transcription
@@ -335,19 +348,22 @@ static char* extract_formatted_address(const char* ai_response) {
      // Create a named pipe (FIFO)
      unlink(path); // Remove any existing pipe
      if (mkfifo(path, 0666) == -1) {
-         perror("mkfifo");
-         pthread_exit(NULL);
+         if (errno != EEXIST) {
+             // If the error is something other than "file exists", it's a real problem
+             perror("mkfifo");
+             pthread_exit(NULL);
+         }
+         // If the pipe already exists, we'll just use it
+         printf("Using existing FIFO pipe\n");
+     } else {
+         printf("Created new FIFO pipe\n");
      }
      
      // Command to record audio and write to both the WAV file and the path
      char cmd[2048];
-    //  snprintf(cmd, sizeof(cmd), 
-    //          "arecord --device=hw:3,0 --format=S16_LE --rate=44100 -c1 | tee %s > %s",
-    //          path, output_path);
-
-    snprintf(cmd, sizeof(cmd), 
-        "arecord --device=hw:2,0 --format=S16_LE --rate=44100 -c2 | tee %s > %s",
-        path, output_path);
+     snprintf(cmd, sizeof(cmd), 
+         "arecord --device=hw:2,0 --format=S16_LE --rate=44100 -c2 | tee %s > %s",
+         path, output_path);
      
      // Start the recording process
      int pipe_fd[2];
@@ -381,9 +397,22 @@ static char* extract_formatted_address(const char* ai_response) {
      close(pipe_fd[1]);
      
      // Open the FIFO for reading audio data for sound detection
-     int fifo_fd = open(path, O_RDONLY | O_NONBLOCK);
+     int fifo_fd = -1;
+     int open_attempts = 0;
+     const int MAX_OPEN_ATTEMPTS = 10;
+     
+     while (fifo_fd == -1 && open_attempts < MAX_OPEN_ATTEMPTS) {
+         fifo_fd = open(path, O_RDONLY | O_NONBLOCK);
+         if (fifo_fd == -1) {
+             printf("Attempt %d to open FIFO failed, retrying...\n", open_attempts + 1);
+             open_attempts++;
+             // Short delay before retry
+             usleep(200000); // 200ms
+         }
+     }
+     
      if (fifo_fd == -1) {
-         perror("open fifo");
+         perror("open fifo - all attempts failed");
          close(pipe_fd[0]);
          kill(arecord_pid, SIGTERM);
          waitpid(arecord_pid, NULL, 0);
@@ -522,53 +551,74 @@ static char* extract_formatted_address(const char* ai_response) {
          if (result && !shutting_down) {
              printf("Auto-transcription result: %s\n", result);
              
+             // Check if this is a shutdown command
+             if (contains_shutdown_command(result)) {
+                 printf("Shutdown command detected!\n");
+                 
+                 // Call the shutdown callback if registered
+                 if (shutdown_callback) {
+                     shutdown_callback();
+                     return NULL; // Exit early
+                 }
+             }
+             // Check if this is a clear target command
+             else if (contains_clear_target(result)) {
+                 printf("Clear target command detected\n");
+                 
+                 // Call the clear target callback if registered
+                 if (clear_target_callback) {
+                     clear_target_callback();
+                 }
+             } 
              // Check if this is a location setting request
-             char* location = parse_location(result);
-             if (location) {
-                 printf("Location detected: %s\n", location);
-                 
-                 // Create a formatted query for the AI to get address details
-                 char location_query[1024];
-                 snprintf(location_query, sizeof(location_query), 
-                         "Provide only the full address in standard format for: %s. Format should be like: 8888 University Dr W, Burnaby, BC V5A 1S6. Do not include any other text in your response.", location);
-                         
-                 // Process with AI API for location formatting
-                 printf("Getting formatted address for location...\n");
-                 char* ai_response = AI_processText(location_query);
-                 if (ai_response && !shutting_down) {
-                    printf("AI response: %s\n", ai_response);
-                    
-                    // Extract just the formatted address part
-                    char* clean_address = extract_formatted_address(ai_response);
-                    
-                    if (clean_address && *clean_address) {  // Make sure it's not empty
-                        printf("Setting navigation target to: [%s]\n", clean_address);
+             else {
+                 char* location = parse_location(result);
+                 if (location) {
+                     printf("Location detected: %s\n", location);
+                     
+                     // Create a formatted query for the AI to get address details
+                     char location_query[1024];
+                     snprintf(location_query, sizeof(location_query), 
+                             "Provide only the full address in standard format for: %s. Format should be like: 8888 University Dr W, Burnaby, BC V5A 1S6. Do not include any other text in your response.", location);
+                             
+                     // Process with AI API for location formatting
+                     printf("Getting formatted address for location...\n");
+                     char* ai_response = AI_processText(location_query);
+                     if (ai_response && !shutting_down) {
+                        printf("AI response: %s\n", ai_response);
                         
-                        // Call the location callback if registered
-                        if (location_callback) {
-                            location_callback(clean_address);
-                        }
+                        // Extract just the formatted address part
+                        char* clean_address = extract_formatted_address(ai_response);
                         
-                        free(clean_address);
-                    } else {
-                        printf("Failed to extract a valid address from AI response\n");
-                        if (clean_address) {
+                        if (clean_address && *clean_address) {  // Make sure it's not empty
+                            printf("Setting navigation target to: [%s]\n", clean_address);
+                            
+                            // Call the location callback if registered
+                            if (location_callback) {
+                                location_callback(clean_address);
+                            }
+                            
                             free(clean_address);
+                        } else {
+                            printf("Failed to extract a valid address from AI response\n");
+                            if (clean_address) {
+                                free(clean_address);
+                            }
                         }
+                    } else {
+                        printf("Failed to get formatted address\n");
                     }
-                } else {
-                    printf("Failed to get formatted address\n");
-                }
-                 
-                 free(location);
-             } else if (!shutting_down) {
-                 // Normal AI processing for non-location queries
-                 printf("Getting AI response...\n");
-                 char* ai_response = AI_processTranscription();
-                 if (ai_response) {
-                     printf("AI response: %s\n", ai_response);
-                 } else {
-                     printf("Failed to get AI response\n");
+                     
+                     free(location);
+                 } else if (!shutting_down) {
+                     // Normal AI processing for non-location queries
+                     printf("Getting AI response...\n");
+                     char* ai_response = AI_processTranscription();
+                     if (ai_response) {
+                         printf("AI response: %s\n", ai_response);
+                     } else {
+                         printf("Failed to get AI response\n");
+                     }
                  }
              }
          } else {
@@ -636,28 +686,61 @@ static char* extract_formatted_address(const char* ai_response) {
  
  // Cleanup and free resources
  void Microphone_cleanup(void) {
-     // Set the shutdown flag
+     printf("Starting microphone cleanup...\n");
+     
+     // Set the shutdown flag first
      shutting_down = 1;
      
-     // Stop recording if active
-     if (recording_active) {
-         Microphone_stopRecording();
-     }
-     
-     // Stop listener if active
-     if (listener_active) {
-         Microphone_stopButtonListener();
-     }
-     
-     // Kill any remaining arecord process
+     // Kill arecord immediately if it's running
      if (arecord_pid > 0) {
-         kill(arecord_pid, SIGTERM);
-         waitpid(arecord_pid, NULL, 0);
+         printf("Killing arecord process (PID: %d)...\n", arecord_pid);
+         kill(arecord_pid, SIGKILL);
+         
+         // Wait for the process to terminate with a timeout
+         int status;
+         struct timespec start, current;
+         clock_gettime(CLOCK_MONOTONIC, &start);
+         
+         while (1) {
+             pid_t result = waitpid(arecord_pid, &status, WNOHANG);
+             if (result == arecord_pid || result == -1) {
+                 // Process exited or error
+                 break;
+             }
+             
+             // Check if we've waited too long (1 second max)
+             clock_gettime(CLOCK_MONOTONIC, &current);
+             if (current.tv_sec - start.tv_sec > 1) {
+                 printf("Timeout waiting for arecord to exit\n");
+                 break;
+             }
+             
+             usleep(10000); // 10ms sleep
+         }
+         
          arecord_pid = -1;
      }
      
+     // Stop recording if active - AFTER killing arecord
+     pthread_mutex_lock(&mic_mutex);
+     recording_active = 0;
+     listener_active = 0;
+     pthread_cond_broadcast(&mic_cond); // Signal any waiting threads
+     pthread_mutex_unlock(&mic_mutex);
+     
+     // Remove any leftover named pipes
+     char path[512];
+     snprintf(path, sizeof(path), "%s/audio_fifo", output_folder);
+     if (access(path, F_OK) == 0) {
+         printf("Removing FIFO pipe: %s\n", path);
+         unlink(path);
+     }
+     
      // Clean up rotary state
+     printf("Cleaning up rotary state...\n");
      RotaryState_cleanup();
+     
+     printf("Microphone cleanup complete.\n");
  }
  
  // Start recording audio
@@ -735,6 +818,16 @@ static char* extract_formatted_address(const char* ai_response) {
      location_callback = callback;
  }
  
+ // Function to register a callback for clear target command
+ void Microphone_setClearTargetCallback(void (*callback)(void)) {
+     clear_target_callback = callback;
+ }
+ 
+ // Function to register a callback for shutdown command
+ void Microphone_setShutdownCallback(void (*callback)(void)) {
+     shutdown_callback = callback;
+ }
+ 
  // Transcribe the last recording and return the result
  char* Microphone_transcribe(void) {
      if (shutting_down) {
@@ -758,14 +851,14 @@ static char* extract_formatted_address(const char* ai_response) {
      printf("Transcribing audio from %s...\n", audio_path);
      
      // Check if the Python script exists in the current directory
-     if (access("speech.py", F_OK) == -1) {
-         printf("Error: speech.py not found in the current directory.\n");
+     if (access("my_speech.py", F_OK) == -1) {
+         printf("Error: my_speech.py not found in the current directory.\n");
          return NULL;
      }
      
      // Run the Python script with the audio file path - with more space for command
      char cmd[2048];  // Larger buffer to avoid truncation warnings
-     snprintf(cmd, sizeof(cmd), "python3 ./speech.py %s", audio_path);
+     snprintf(cmd, sizeof(cmd), "python3 ./my_speech.py %s", audio_path);
      
      // Use timeout version to prevent hanging
      char *output = read_command_output_with_timeout(cmd, 10); // 10 second timeout
