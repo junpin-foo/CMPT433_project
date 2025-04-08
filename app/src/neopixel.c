@@ -135,6 +135,10 @@ void NeoPixel_cleanUp()
 {
     assert(isInitialized);
     isRunning = false;
+    Led_setTrigger(RED_LED, "none");
+    Led_setBrightness(RED_LED, 0);
+    Led_setTrigger(GREEN_LED, "none");
+    Led_setBrightness(GREEN_LED, 0);
     Led_cleanUp();
     pthread_join(LEDpthread, NULL);
     isInitialized = false;

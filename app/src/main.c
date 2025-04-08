@@ -25,9 +25,9 @@ int main() {
     Gpio_initialize();
     Joystick_initialize();
     Accelerometer_initialize();
-    // GPS_init();
+    GPS_init();
     // Calling this will enable a thread read the gps data from demo_gps.txt. See "demo_locationData.txt" in project folder for more info"
-    GPS_demoInit();
+    // GPS_demoInit();
     SpeedLED_init();
     StreetAPI_init();
     RoadTracker_init();

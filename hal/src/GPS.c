@@ -42,9 +42,9 @@ static void* gps_thread_func(void* arg) {
         current_location = new_location;
         if (current_location.latitude == INVALID_LATITUDE) {
             signal = false;
-            printf("NO GPS Signal !\n");
+            // printf("NO GPS Signal !\n");
         } else {
-            printf("Current_location: Latitude %.6f, Longitude: %.6f, Speed: %.6f \n", current_location.latitude, current_location.longitude, current_location.speed);
+            // printf("Current_location: Latitude %.6f, Longitude: %.6f, Speed: %.6f \n", current_location.latitude, current_location.longitude, current_location.speed);
             signal = true;
         }
         pthread_mutex_unlock(&gps_mutex); // Unlock the mutex after updating
