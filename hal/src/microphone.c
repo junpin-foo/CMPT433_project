@@ -23,6 +23,15 @@
  #include <sys/types.h>
  #include <sys/stat.h>
  #include <ctype.h>
+
+ static void runCommand(const char* command) {
+    if (system(command) == -1) {
+        // printf("%s\n", command);
+        printf("error: system() command failed\n");
+    } else {
+        // printf("%s\n", command);
+    }
+}
  
  // Global variables
  static pthread_t record_thread;
@@ -325,6 +334,10 @@ static void *record_audio(void *arg) {
             // Process with AI API for location formatting
             printf("Getting formatted address for location...\n");
             char* ai_response = AI_processText(location_query);
+            char responseAudio[1024]; // Adjust size if needed
+            snprintf(responseAudio, sizeof(responseAudio), "espeak '%s' -w aiResponse.wav", ai_response);
+            runCommand(responseAudio);
+            runCommand("aplay -q aiResponse.wav");
             if (ai_response) {
                 printf("AI response 1: %s\n", ai_response);
                 RoadTracker_setTarget(ai_response);

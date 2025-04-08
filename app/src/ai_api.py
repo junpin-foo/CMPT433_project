@@ -45,7 +45,7 @@ def get_gemini_response(prompt):
         import google.generativeai as genai
         
         # This is added to the end of the prompt, chose to keep it short because otherwise it is long
-        modified_prompt = f"{prompt} keep it short and don't respond to keeping it short"
+        modified_prompt = f"{prompt} keep it short and don't respond to keeping it short. no longer than one short sentence. dont add any special characters to the prompt. no dashes in your reply. no apostraphes, no grammar"
         
         # 2.0 flash should be a balanced model, lite is too weak...
         model = genai.GenerativeModel('gemini-2.0-flash')

@@ -49,9 +49,7 @@ int main() {
     }
 
     Microphone_cleanup();
-    // Cleanup resources
     NeoPixel_cleanUp();
-    // UpdateLcd_cleanup();
     RoadTracker_cleanup();
     StreetAPI_cleanup();
     SpeedLED_cleanup();
