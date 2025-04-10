@@ -1,3 +1,8 @@
+/*
+* This file implements the StreetAPI module, which provides functions for converting addresses
+* to latitude and longitude coordinates and vice versa using the OpenStreetMap Nominatim API.
+**/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -1,3 +1,8 @@
+/* 
+* This file provides the implementation of the GPS module, which interacts with a GPS device
+* to retrieve location and speed data. It includes functions to initialize the GPS device, read data from it,
+**/
+
 #include <termios.h>
 #include <fcntl.h>
 #include <errno.h>

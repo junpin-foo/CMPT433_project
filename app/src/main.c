@@ -43,6 +43,7 @@ int main() {
         printf("Failed to start button listener.\n");
     }
     
+    // Main loop to keep the program running. The program will exit when the joystick button is pressed.
     while (true) {
         if (Joystick_isButtonPressed()) {
             break;

@@ -1,3 +1,8 @@
+/*
+* This file implements the RoadTracker module, which tracks the progress of a target location
+* using GPS data. It provides functions to set a target location, get the current location,
+* calculate the distance to the target, and reset the target location. Check the header file for more details.
+**/
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
