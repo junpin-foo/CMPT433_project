@@ -55,25 +55,24 @@ void RoadTracker_cleanup(void) {
     isInitialized = false;
 }
 
-// Thread function to track location
+// Thread function to track the progress of the target location
 static void* trackLocationThreadFunc(void* arg) {
     assert(isInitialized);
-    (void)arg; // Suppress unused parameter warning
+    (void)arg;
     while (isRunning) {
-        if (target_set) {
+        if (target_set) { // Only run if target is set
             current_location  = GPS_getLocation();
             if (current_location.latitude == INVALID_LATITUDE) {
-                progress = 0;
-                printf("Invalid Current Location. Check GPS signal !\n");
+                progress = 0; // Reset progress if GPS signal is invalid
+                printf("Invalid Current Location. Check GPS signal !\n"); 
             } else {
                 current_location  = GPS_getLocation();
                 current_distance = haversine_distance(current_location, target_location);
                 if (totalDistanceNeeded > 0) {
                     progress = ((totalDistanceNeeded - current_distance) / totalDistanceNeeded) * 100;
-                    // printf("Progress: %.2f%%\n", progress);
                     if (progress < 0) {
-                        progress = 0;
-                    } else if (current_distance <= THRESHOLD_REACH) { // Consider reach if within threshold
+                        progress = 0;  // Prevent negative progress
+                    } else if (current_distance <= THRESHOLD_REACH) { // Consider reach if within certain threshold to prevent the target is actually in the building
                         progress = 100;
                     }
                 }
@@ -92,7 +91,7 @@ static void* trackLocationThreadFunc(void* arg) {
     return NULL;
 }
 
-// If possible, calling it when microphone receive keyword such as "reset target"
+// Function to reset the target location and data
 void RoadTracker_resetTarget() {
     assert(isInitialized);
     pthread_mutex_lock(&roadTrackerMutex); // Lock the mutex before resetting target
@@ -102,6 +101,7 @@ void RoadTracker_resetTarget() {
     pthread_mutex_unlock(&roadTrackerMutex); // Unlock the mutex after resetting target
 }
 
+// Function to remove the trailing spaces from the address parsing from microphone
 static void rtrim(char *str) {
     int len = strlen(str);
     while (len > 0 && isspace((unsigned char)str[len - 1])) {
@@ -109,7 +109,6 @@ static void rtrim(char *str) {
     }
     str[len] = '\0';
 }
-
 
 // Expecting to be call from microphone
 // Function to set the target location
@@ -122,12 +121,12 @@ void RoadTracker_setTarget(char *address) {
     target_location = StreetAPI_get_lat_long(address);
     printf("Target Location: Latitude %.6f, Longitude %.6f\n", target_location.latitude, target_location.longitude);
     if (target_location.latitude == INVALID_LATITUDE) {
-        printf("Fail to set the Target Location due to invalid address. Check the address again !\n");
+        // printf("Fail to set the Target Location due to invalid address. Check the address again !\n");
         runCommand("espeak -v mb-en1 -s 120  'Fail to set the Target Location due to invalid input address. Check the input address again ' -w invalidTargetError.wav");
         runCommand("aplay -q invalidTargetError.wav");
         RoadTracker_resetData();
     } else if (souruce_location.latitude == INVALID_LATITUDE) {
-        printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again!\n");
+        // printf("Fail to set the Target Location due to invalid current location. Check the GPS signal again!\n");
         runCommand("espeak -v mb-en1 -s 120  'Fail to set the Target Location due to invalid current location. Check the GPS signal again ' -w invalidCurrentError.wav");
         runCommand("aplay -q invalidCurrentError.wav");
         RoadTracker_resetData();
@@ -146,6 +145,7 @@ void RoadTracker_setTarget(char *address) {
     pthread_mutex_unlock(&roadTrackerMutex); // Unlock the mutex after setting target
 }
 
+// Function to get the target location
 static void RoadTracker_resetData() {
     target_set = false;
     target_location.latitude = INVALID_LATITUDE;
@@ -165,6 +165,7 @@ static double deg_to_rad(double deg) {
     return deg * (M_PI / 180.0);
 }
 
+// Fuinction to run a system command
 static void runCommand(const char* command) {
     if (system(command) == -1) {
         // printf("%s\n", command);
@@ -188,11 +189,7 @@ static double haversine_distance(struct location loc1, struct location loc2) {
     return EARTH_RADIUS * c; // Distance in kilometers
 }
 
-struct location RoadTracker_getSourceLocation(void) {
-    assert(isInitialized);
-    return souruce_location;
-}
-
+// Function to get the current location
 struct location RoadTracker_getCurrentLocation(void) {
     return souruce_location;
 }
@@ -202,10 +199,6 @@ struct location RoadTracker_getTargetLocation(void) {
     return target_location;
 }
 
-// Function to get the target location address
-char* RoadTracker_getTargetAddress(void) {
-    return target_address;
-}
 
 // Function to get progress percentage
 double RoadTracker_getProgress(void) {

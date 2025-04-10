@@ -79,7 +79,7 @@ void NeoPixel_init(void)
     }
 }
 
-// Thread function
+// Thread function to set the neoPixel colors and the led based on the road tracker progress and parking mode
 void* LED_thread(void* arg)
 {
     (void)arg; // Mark the parameter as unused

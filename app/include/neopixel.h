@@ -1,3 +1,10 @@
+/* 
+ * This header defines the interface for controlling NeoPixel LEDs and onboard GPIO LEDs
+ * based on GPS signal status, road tracking progress, and parking mode.
+ * 
+ * It Uses a background thread to update LED states every second and communicates to R5 to control NeoPixel animations.
+ * Integrates with the RoadTracker and Parking modules for dynamic behavior.
+**/
 #ifndef LED_CONTROLLER_H
 #define LED_CONTROLLER_H
 

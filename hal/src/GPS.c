@@ -25,7 +25,7 @@ static bool isRunning = false;
 static bool signal = false;
 static bool isInitialized = false;
 static char* GPS_read();
-static struct location parse_GPRMC(char* gprmc_sentence);
+static struct location parse_GNRMC(char* gprmc_sentence);
 
 // Function that runs in the thread to continuously read GPS data
 static void* gps_thread_func(void* arg) {
@@ -35,7 +35,7 @@ static void* gps_thread_func(void* arg) {
         // Get the latest GPS data
         char* gps_data = GPS_read();
         // Parse the data into the location structure
-        struct location new_location = parse_GPRMC(gps_data);
+        struct location new_location = parse_GNRMC(gps_data);
 
         // Update the global location safely using mutex
         pthread_mutex_lock(&gps_mutex);   // Lock the mutex before updating
@@ -96,7 +96,7 @@ void GPS_init() {
     pthread_create(&gps_thread, NULL, gps_thread_func, NULL);
 }
 
-
+// Using for Demo purpose
 static void* gps_thread2_func(void* arg) {
     (void)arg;
     while (isRunning) {
@@ -119,21 +119,15 @@ static void* gps_thread2_func(void* arg) {
     return NULL;
 }
 
-
+// For demo using to read geolocation data from demo_gps.txt
 void GPS_demoInit() {
     signal = true;
     isRunning = true;
     pthread_create(&gps_thread, NULL, gps_thread2_func, NULL);
 }
 
-void GPS_setLocation(struct location loc) {
-    pthread_mutex_lock(&gps_mutex);   // Lock the mutex before updating
-    current_location.latitude = loc.latitude;
-    current_location.longitude = loc.longitude;
-    current_location.speed = loc.speed;
-    pthread_mutex_unlock(&gps_mutex); // Unlock the mutex after updating
-}
 
+// Function to get the current GPS location
 struct location GPS_getLocation() {
     struct location loc;
     pthread_mutex_lock(&gps_mutex);   // Lock the mutex before reading
@@ -142,23 +136,9 @@ struct location GPS_getLocation() {
     return loc;  // Return the most recent GPS location
 }
 
-void configure_serial(int serial_port) {
-    struct termios options;
-
-    // Get current settings
-    tcgetattr(serial_port, &options);
-
-    // Set timeout behavior
-    options.c_cc[VMIN]  = 0;   // Minimum number of characters to read
-    options.c_cc[VTIME] = 10;  // Timeout in tenths of a second (10 = 1 second)
-
-    // Apply settings
-    tcsetattr(serial_port, TCSANOW, &options);
-}
-
+// Stati function to read GPS data from the serial port. This function only stop when finds a $GNRMC message (which include the location data and speed)
 static char* GPS_read() {
     static char read_buf[BUFFER_SIZE];
-    configure_serial(serial_port);
     while (isRunning) {  // Keep reading until we find a $GNGGA message
         int n = read(serial_port, &read_buf, sizeof(read_buf)); // Leave space for null terminator
         if (n > 0) {
@@ -173,7 +153,8 @@ static char* GPS_read() {
     return "";
 }
 
-static struct location parse_GPRMC(char* gnrmc_sentence) {
+// Function to parse the GNRMC sentence and extract latitude, longitude, and speed
+static struct location parse_GNRMC(char* gnrmc_sentence) {
     char *token;
     char temp[BUFFER_SIZE];
     struct location data = {INVALID_LATITUDE, INVALID_LONGITUDE, INVALID_SPEED};
@@ -198,7 +179,7 @@ static struct location parse_GPRMC(char* gnrmc_sentence) {
         return invalidData; // Invalid sentence (data not valid)
     }
 
-    // Latitude
+    // Latitude Calculation
     token = strtok(NULL, ",");
     if (token == NULL || strlen(token) == 0) return invalidData;
     double raw_lat = atof(token);
@@ -206,11 +187,11 @@ static struct location parse_GPRMC(char* gnrmc_sentence) {
     double lat_min = raw_lat - (lat_deg * DEGREE_FACTOR);
     data.latitude = lat_deg + (lat_min / MINUTES_IN_DEGREE);
 
-    // N/S Indicator
+    // North/South Indicator
     token = strtok(NULL, ",");
     if (token && token[0] == 'S') data.latitude = -data.latitude;
 
-    // Longitude
+    // Longitude Calculation
     token = strtok(NULL, ",");
     if (token == NULL || strlen(token) == 0) return invalidData;
     double raw_lon = atof(token);
@@ -218,7 +199,7 @@ static struct location parse_GPRMC(char* gnrmc_sentence) {
     double lon_min = raw_lon - (lon_deg * DEGREE_FACTOR);
     data.longitude = lon_deg + (lon_min / MINUTES_IN_DEGREE);
 
-    // E/W Indicator
+    // East/West Indicator
     token = strtok(NULL, ",");
     if (token && token[0] == 'W') data.longitude = -data.longitude;
 
@@ -232,10 +213,10 @@ static struct location parse_GPRMC(char* gnrmc_sentence) {
 }
 
 void GPS_cleanup() {
-    isRunning = false;  // Stop the GPS thread
-    isInitialized = false;  // Mark GPS as uninitialized
-    pthread_cancel(gps_thread);  // Wait for the thread to finish
-    close(serial_port);  // Close the serial port
+    isRunning = false;  
+    isInitialized = false;  
+    pthread_cancel(gps_thread); 
+    close(serial_port);
     printf("GPS cleanup\n");
 }
 
